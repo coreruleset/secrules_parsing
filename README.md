@@ -18,13 +18,14 @@ How to use it (CLI):
 1. Execute `./secrules_parser.py` specifying the location of the files you want to scan using the -f/--files argument. This takes wildcards or individual files.
 
    `$ python secrules_parser.py -f /owasp-crs/rules/*.conf`
-   
+
 3. Add flags to accomplish needed tasks:
 
 
  * -h, --help:
   * *Description:* show the help message and exit
   * *Example:* `$ python secrules_parser.py -h`
+  
  * -r, --regex:
   * *Description:* Extract regular expressions from rules file
   * *Example:*

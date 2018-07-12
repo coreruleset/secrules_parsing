@@ -64,7 +64,7 @@ def secrule_id_processor(rule):
 def call_activites(args, models):
     """ For firing actions based on CLI args """
     if args.correctness:
-        get_correctness(args.files, modules)
+        get_correctness(args.files, models)
     if args.regex:
         regexs = {}
         for file_index in range(0, len(args.files)):

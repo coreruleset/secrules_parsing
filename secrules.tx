@@ -56,7 +56,7 @@ CollectionName:
 
 SpecialCollection: 'XML' ':' XPathExpression;
 
-XPathExpression: /\/\*/;
+XPathExpression: /(\/\*|\/\/@\*)/;
 
 AnythingBetweenSlashes: /(\*|\\\/)+/;
 AnythingBetweenSingleQuotes: /\'.+\'/;
@@ -83,7 +83,7 @@ Action:
 DisruptiveAction: 'block' | 'accept' | 'deny' | 'drop' | 'pass' | 'pause';
     
 TransientAction:
-    'auditEngine=' auditEngine=AuditEngineValue | 'auditLogParts=' auditLogParts=AuditLogPartsValue | 'debugLogLevel=' debugLog=INT | 'forceRequestBodyVariable=' forceRequestBodyVariable=OnOffValue | 'requestBodyAccess=' requestBodyAccess=OnOffValue | 'requestBodyLimit=' requestBodyLimit=INT | 'requestBodyProcessor=' requestBodyProcessor=RequestBodyProcessorValue | 'responseBodyAccess=' responseBodyAccess=OnOffValue | 'responseBodyLimit=' responseBodyLimit=INT | 'ruleEngine=' ruleEngine=RuleEngineValue | 'ruleRemoveById=' ruleRemoveById=INT | 'ruleRemoveByMsg=' ruleRemoveByMsg=MessageValue | 'ruleRemoveByTag=' ruleRemoveByTag=Tag | 'ruleRemoveTargetById=' ruleRemoveTargetById=INT ';' removeVariable=VariableOrCollection ':'? removeVariableName=VariableName? | 'ruleRemoveTargetByMsg=' message=MessageValue ';' removeVariable=VariableOrCollection ':'? removeVariableName=VariableName? | 'ruleRemoveTargetByTag=' tagName=Tag ';' removeVariable=VariableOrCollection ':'? removeVariableName=VariableName? | 'hashEngine=' | 'hashEnforcement=';
+    'auditEngine=' auditEngine=AuditEngineValue | 'auditLogParts=' auditLogParts=AuditLogPartsValue | 'debugLogLevel=' debugLog=INT | 'forceRequestBodyVariable=' forceRequestBodyVariable=OnOffValue | 'requestBodyAccess=' requestBodyAccess=OnOffValue | 'requestBodyLimit=' requestBodyLimit=INT | 'requestBodyProcessor=' requestBodyProcessor=RequestBodyProcessorValue | 'responseBodyAccess=' responseBodyAccess=OnOffValue | 'responseBodyLimit=' responseBodyLimit=INT | 'ruleEngine=' ruleEngine=RuleEngineValue | 'ruleRemoveById=' ruleRemoveById=RangeINT | 'ruleRemoveByMsg=' ruleRemoveByMsg=MessageValue | 'ruleRemoveByTag=' ruleRemoveByTag=Tag | 'ruleRemoveTargetById=' ruleRemoveTargetById=RangeINT ';' removeVariable=VariableOrCollection ':'? removeVariableName=VariableName? | 'ruleRemoveTargetByMsg=' message=MessageValue ';' removeVariable=VariableOrCollection ':'? removeVariableName=VariableName? | 'ruleRemoveTargetByTag=' tagName=Tag ';' removeVariable=VariableOrCollection ':'? removeVariableName=VariableName? | 'hashEngine=' | 'hashEnforcement=';
 
 Transformation:
     'base64Decode'|'sqlHexDecode'|'base64DecodeExt'|'base64Encode'|'cmdLine'|'compressWhiteSpace'|'cssDecode'|'escapeSeqDecode'|'hexDecode'|'hexEncode'|'htmlEntityDecode'|'jsDecode'|'length'|'lowercase'|'md5'|'none'|'normalisePathWin'|'normalizePathWin'|'normalisePath'|'normalizePath'|'parityEven7bit'|'parityOdd7bit'|'parityZero7bit'|'removeNulls'|'removeWhitespace'|'replaceComments'|'removeCommentsChar'|'removeComments'|'replaceNulls'|'urlDecodeUni'|'urlDecode'|'uppercase'|'urlEncode'|'utf8toUnicode'|'sha1'|'trimLeft'|'trimRight'|'trim';
@@ -129,7 +129,7 @@ PathNameValue: /[a-z0-9\-_\.\/]+/;
 Macro:  INT | OperationMacro | ExtendedMacro | MacroVar;
 
 // This extended macro are a little bag of holding...
-ExtendedMacro: /[A-Za-z0-9S\-\_\.\:\ \/\%\{\}\|\+=]+/;
+ExtendedMacro: /[A-Za-z0-9S\-\_\.\:\ \/\%\{\}\|\+=#]+/;
     
 OperationMacro: ('+' | '-') var=MacroVar;
 
@@ -172,6 +172,6 @@ RuleEngineValue: OnOffValue | 'DetectionOnly';
 // Can this be used multiple times, e.g.: +AC?
 AuditLogPartsValue: /(\+|-)[A-Z]/;
 
-RequestBodyProcessorValue: 'text/xml' | 'text/json';
+RequestBodyProcessorValue: 'text/xml' | 'text/json' | 'URLENCODED';
 
 Severity: "'"? ('ALERT' | 'CRITICAL' | 'EMERGENCY' | 'ERROR' | 'NOTICE' | 'WARNING') "'"?;

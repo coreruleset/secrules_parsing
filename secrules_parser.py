@@ -16,6 +16,7 @@ import argparse
 from textx.metamodel import metamodel_from_file
 from textx.exceptions import TextXSyntaxError
 import json
+import pkg_resources
 
 
 def parse_args():
@@ -31,15 +32,21 @@ def parse_args():
     return myargs
 
 
-def process_rules(args):
+def process_rules(files, verbose=False):
     """ Parse our rule files with the provided parser """
     models = []
     # Load Meta-Model
-    modsec_mm = metamodel_from_file('secrules.tx', memoization=True)
+    resource_package = __name__
+    resource_path = '/'.join(['secrules.tx'])
+    template = pkg_resources.resource_filename(resource_package, resource_path)
+    modsec_mm = metamodel_from_file(template, memoization=True)
     # Register test processor
     modsec_mm.register_obj_processors({'SecRule': secrule_id_processor})
-    for rule_file in args.files:
-        if args.verbose:
+    # Make sure we don't have an empty list of files
+    if files == []:
+        return models
+    for rule_file in files:
+        if verbose:
             print('Processing file %s:' % rule_file)
         try:
             model = modsec_mm.model_from_file(rule_file)
@@ -57,11 +64,7 @@ def secrule_id_processor(rule):
 def call_activites(args, models):
     """ For firing actions based on CLI args """
     if args.correctness:
-        for file_index in range(0, len(args.files)):
-            if isinstance(models[file_index], dict):
-                print("Syntax invalid: %s" % models[file_index])
-            else:
-                get_correctness(args, args.files[file_index])
+        get_correctness(args.files, modules)
     if args.regex:
         regexs = {}
         for file_index in range(0, len(args.files)):
@@ -104,14 +107,18 @@ def get_rule_regex(rule):
         return None
 
 
-def get_correctness(args, file):
+def get_correctness(files, models):
     """ Checks the correctness of a given rules file """
-    print("Syntax OK: %s" % (file))
+    for file_index in range(0, len(files)):
+        if isinstance(models[file_index], dict):
+            print("Syntax invalid: %s" % models[file_index])
+        else:
+            print("Syntax OK: %s" % (files[file_index]))
     return True
 
 
 if __name__ == "__main__":
     args = parse_args()
     create_output(args.output)
-    models = process_rules(args)
+    models = process_rules(args.files, args.verbose)
     call_activites(args, models)

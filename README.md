@@ -2,7 +2,7 @@
 
 Incomplete parser model and sample application for parsing [Core Rule Set  rules](https://github.com/SpiderLabs/owasp-modsecurity-crs/) written in the SecRules language. It uses the python library [textX](http://www.igordejanovic.net/textX/) for parsing.
 
-How to use it (CLI):
+## How to use it (CLI):
 
 1. Install dependencies
     Dependencies can be installed system-wide, or just for your user (using `--user`).
@@ -54,6 +54,38 @@ How to use it (CLI):
     ```
     $ python secrules_parser.py -c -o out.json -f /owasp-crs/rules/REQUEST-920-PROTOCOL-ENFORCEMENT.conf    
     ```
+
+## How to use it (API):
+
+### process_rules(list files)
+Takes a list of file path's and returns models
+```
+import glob
+import os
+from secrules_parsing import secrules_parser
+
+# Extract all of our pathing
+files = glob.glob("../../rules/*.conf")
+# Pass absolute paths because of module location
+files = [os.path.abspath(path) for path in files]
+models = secrules_parser.process_rules(files)
+```
+
+### get_correctness(list files, list models)
+```
+import glob
+import os
+from secrules_parsing import secrules_parser
+
+# Extract all of our pathing
+files = glob.glob("../../rules/*.conf")
+# Pass absolute paths because of module location
+files = [os.path.abspath(path) for path in files]
+models = secrules_parser.process_rules(files)
+secrules_parser.get_correctness(files, models)
+```
+
+## Misc
 
 To visualize the syntax tree, use:
 

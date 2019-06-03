@@ -94,7 +94,7 @@ def get_rule_id(rule):
 
 def get_rule_regex(rule):
     """ Gets the regex. Only for a given SecAction or SecRule """
-    if rule.__class__.__name__ == "SecRule" or rule.__class__.__name__ == "SecAction":
+    if rule.__class__.__name__ == "SecRule":
         output = {}
         if rule.operator.rx is not None:
             for action in rule.actions:

@@ -63,8 +63,9 @@ def secrule_id_processor(rule):
 
 def call_activites(args, models):
     """ For firing actions based on CLI args """
+    exitcode = 0
     if args.correctness:
-        get_correctness(args.files, models)
+        exitcode = get_correctness(args.files, models)
     if args.regex:
         regexs = {}
         for file_index in range(0, len(args.files)):
@@ -75,6 +76,7 @@ def call_activites(args, models):
                     output_regex.append(rule_regex)
             regexs[args.files[file_index]] = output_regex
         print(json.dumps(regexs))
+    return exitcode
 
 
 def create_output(output_loc):
@@ -109,16 +111,19 @@ def get_rule_regex(rule):
 
 def get_correctness(files, models):
     """ Checks the correctness of a given rules file """
+    exitcode = 0
     for file_index in range(0, len(files)):
         if isinstance(models[file_index], dict):
             print("Syntax invalid: %s" % models[file_index])
+            exitcode = 1
         else:
             print("Syntax OK: %s" % (files[file_index]))
-    return True
+    return exitcode
 
 
 if __name__ == "__main__":
     args = parse_args()
     create_output(args.output)
     models = process_rules(args.files, args.verbose)
-    call_activites(args, models)
+    exitcode = call_activites(args, models)
+    sys.exit(exitcode)

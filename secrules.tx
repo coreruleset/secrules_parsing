@@ -65,7 +65,7 @@ Count: '&';
 
 //- pattern match (pm/pmf)    
 Operator:
-    ('beginsWith' beginswith=PathOrMacro | 'contains' contains=PathOrMacro | 'containsWord' containsWord=STRING | detectsqli ?= 'detectSQLi' | detectxss ?= 'detectXSS' | 'endsWith' endswith=ExtendedMacro | 'fuzzyHash' fuzzyhash=STRING | 'eq' eq=INT | 'ge' ge=Macro | geolookup ?= 'geoLookup'  | 'gsbLookup' gsblookup=INT | 'gt' gt=Macro | 'inspectFile' inspectfile=URI | 'ipMatch' ipmatch+=IPCIDR[','] |'ipMatchF' ipmatchf=STRING | 'ipMatchFromFile' ipmatchfromfile=STRING | 'le' le=INT | 'lt' lt=Macro | nomatch ?= 'noMatch' | 'pmf' pmf=PathNameValue | 'pmFromFile' pmfromfile=PathNameValue | 'pm' pm=PatternMatch | 'rbl' rbl=Hostname | 'rsub' rsub=AnythingBetweenSlashes | 'rx' rx=RegExp | 'streq' streq=StringWithSpaces | 'strmatch' strnmatch=STRING | unconditionalmatch ?= 'unconditionalMatch' | 'validateByteRange' validatebyterange=ByteRangeList | 'validateDTD' validatedtd=PathNameValue | 'validateHash' validatehash=RegExp | 'validateSchema' validateschema=PathNameValue | validateurlencoding ?= 'validateUrlEncoding' | validateutf8encoding ?= 'validateUtf8Encoding' | 'verifyCC' verifycc=RegExp | 'verifyCPF' verifycpf=STRING | 'verifySSN' verifyssn=RegExp | 'within' within=MacroVar | '' rx=RegExp);
+    ('beginsWith' beginswith=PathOrMacro | 'contains' contains=PathOrMacro | 'containsWord' containsWord=STRING | detectsqli ?= 'detectSQLi' | detectxss ?= 'detectXSS' | 'endsWith' endswith=ExtendedMacro | 'fuzzyHash' fuzzyhash=STRING | 'eq' eq=INT | 'ge' ge=Macro | geolookup ?= 'geoLookup'  | 'gsbLookup' gsblookup=INT | 'gt' gt=Macro | 'inspectFile' inspectfile=URI | 'ipMatch' ipmatch+=IPCIDR[','] |'ipMatchF' ipmatchf=STRING | 'ipMatchFromFile' ipmatchfromfile=STRING | 'le' le=INT | 'lt' lt=Macro | nomatch ?= 'noMatch' | 'pmf' pmf=PathNameValue | 'pmFromFile' pmfromfile=PathNameValue | 'pm' pm=PatternMatch | 'rbl' rbl=Hostname | 'rsub' rsub=AnythingBetweenSlashes | 'rx' rx=RegExp | 'streq' streq=StringWithSpaces | 'strmatch' strnmatch=STRING | unconditionalmatch ?= 'unconditionalMatch' | 'validateByteRange' validatebyterange=ByteRangeList | 'validateDTD' validatedtd=PathNameValue | 'validateHash' validatehash=RegExp | 'validateSchema' validateschema=PathNameValue | validateurlencoding ?= 'validateUrlEncoding' | validateutf8encoding ?= 'validateUtf8Encoding' | 'verifyCC' verifycc=RegExp | 'verifyCPF' verifycpf=STRING | 'verifySSN' verifyssn=RegExp | 'within' within=MacroOrString | '' rx=RegExp);
 
 /* Actions are separated by ',\' or ',' only */
 //ActionList: actionlist+=;
@@ -118,7 +118,7 @@ SQDelimitedSTRING: "'" msg=MessageValue? ':'? macro=MacroVar? "'";
 // This string has macros inside, but their value isn't stored in a variable for now.
 StringWithMacros: "'" ExtendedMacro "'";
 // String with spaces: when using streq, there are places where a request line is tested
-StringWithSpaces: /[A-Za-z0-9\-\/\ ]+/;    
+StringWithSpaces: /[A-Za-z0-9\-\/\ \.]+/;
 
 PathOrMacro: PathNameValue | MacroVar;
     
@@ -134,6 +134,8 @@ ExtendedMacro: /[A-Za-z0-9S\-\_\.\:\ \/\%\{\}\|\+=#?]+/;
 OperationMacro: ('+' | '-') var=MacroVar;
 
 MacroVar: '%{'? /[a-zA-Z0-9-\_\.]+/ '}'?;
+
+MacroOrString: StringWithSpaces | MacroVar;
 
 /* Messages are textual sentences, e.g.: "This is bad"
 Most of the special characters appear on modsecurity_crs configuracion on rule 901001

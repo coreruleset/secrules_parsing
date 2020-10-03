@@ -118,7 +118,7 @@ SQDelimitedSTRING: "'" msg=MessageValue? ':'? macro=MacroVar? "'";
 // This string has macros inside, but their value isn't stored in a variable for now.
 StringWithMacros: "'" ExtendedMacro "'";
 // String with spaces: when using streq, there are places where a request line is tested
-StringWithSpaces: /[A-Za-z0-9\-\/\ \.]+/;
+StringWithSpaces: /[A-Za-z0-9\-\/\ \._]+/;
 
 PathOrMacro: PathNameValue | MacroVar;
     

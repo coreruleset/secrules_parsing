@@ -11,7 +11,7 @@ SecRule
 
 */
 Rule:
-    SecAction | SecRule | SecRuleScript | SecMarker | SecComponentSignature | SecRuleRemoveById | SecRuleRemoveByTag;
+    SecAction | SecRuleScript | SecRule | SecMarker | SecComponentSignature | SecRuleRemoveById | SecRuleRemoveByTag;
     
 SecAction:
     'SecAction' '"' actions+=Action[','] '"';

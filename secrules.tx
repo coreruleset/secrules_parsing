@@ -11,7 +11,7 @@ SecRule
 
 */
 Rule:
-    SecAction | SecRule | SecMarker | SecComponentSignature | SecRuleRemoveById | SecRuleRemoveByTag;
+    SecAction | SecRuleScript | SecRule | SecMarker | SecComponentSignature | SecRuleRemoveById | SecRuleRemoveByTag;
     
 SecAction:
     'SecAction' '"' actions+=Action[','] '"';
@@ -31,7 +31,10 @@ SecRuleRemoveByTag:
 // ActionList can be empty if is the last rule in chain    
 SecRule:
     'SecRule' variables+=Variable['|']'"' negated='!'? '@'? operator=Operator '"' '"'? actions+=Action[',']? '"'?;
-    
+
+SecRuleScript:
+    'SecRuleScript' '"'? script=PathNameValue '"'? '"'? actions+=Action[',']? '"'?;
+
 IDRangeList:
     idlist+=ID | range=IDRange;
 

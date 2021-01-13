@@ -107,7 +107,7 @@ Phase: /[0-5]/ | 'request' | 'response' | 'logging';
 PatternMatch: /((\\")|[^"])*/;
     
 // For tags in rules: OWASP_CRS/POLICY/METHOD_NOT_ALLOWED
-Tag: /[A-Za-z0-9\/\-_\.\/%{}]+/;
+Tag: /[A-Za-z0-9\/\-_\.\/\%\{\}]+/;
 // Byte Range now is a list of integers, must be a range (allow 1-10).
 ByteRangeList: byterange*=RangeINT[','];
 

@@ -177,6 +177,6 @@ RuleEngineValue: OnOffValue | 'DetectionOnly';
 // Can this be used multiple times, e.g.: +AC?
 AuditLogPartsValue: /(\+|-)[A-Z]/;
 
-RequestBodyProcessorValue: 'text/xml' | 'text/json' | 'URLENCODED';
+RequestBodyProcessorValue: 'text/xml' | 'text/json' | 'URLENCODED' | 'JSON' | 'MULTIPART' | 'XML';
 
 Severity: "'"? ('ALERT' | 'CRITICAL' | 'EMERGENCY' | 'ERROR' | 'NOTICE' | 'WARNING') "'"?;

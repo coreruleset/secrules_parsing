@@ -132,7 +132,7 @@ PathNameValue: /[a-z0-9\-_\.\/]+/;
 Macro:  INT | OperationMacro | ExtendedMacro | MacroVar;
 
 // This extended macro are a little bag of holding...
-ExtendedMacro: /[A-Za-z0-9S\-\_\.\:\ \/\%\{\}\|\+=#?]+/;
+ExtendedMacro: /[A-Za-z0-9S\-\_\.\:\ \/\%\{\}\|\+=#?\<\>]+/;
     
 OperationMacro: ('+' | '-') var=MacroVar;
 
@@ -177,6 +177,6 @@ RuleEngineValue: OnOffValue | 'DetectionOnly';
 // Can this be used multiple times, e.g.: +AC?
 AuditLogPartsValue: /(\+|-)[A-Z]/;
 
-RequestBodyProcessorValue: 'text/xml' | 'text/json' | 'URLENCODED';
+RequestBodyProcessorValue: 'text/xml' | 'text/json' | 'URLENCODED' | 'JSON' | 'MULTIPART' | 'XML';
 
 Severity: "'"? ('ALERT' | 'CRITICAL' | 'EMERGENCY' | 'ERROR' | 'NOTICE' | 'WARNING') "'"?;

@@ -132,7 +132,7 @@ PathNameValue: /[a-z0-9\-_\.\/]+/;
 Macro:  INT | OperationMacro | ExtendedMacro | MacroVar;
 
 // This extended macro are a little bag of holding...
-ExtendedMacro: /[A-Za-z0-9S\-\_\.\:\ \/\%\{\}\|\+=#?]+/;
+ExtendedMacro: /[A-Za-z0-9S\-\_\.\:\ \/\%\{\}\|\+=#?\<\>]+/;
     
 OperationMacro: ('+' | '-') var=MacroVar;
 

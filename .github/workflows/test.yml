@@ -1,0 +1,41 @@
+---
+name: Regression Tests
+
+on: [push, pull_request]
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        crsversion: [3.3.0, 3.2.0]
+
+    steps:
+      - name: "Checkout repo"
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - uses: actions/cache@v2
+        id: cache
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: "Install dependencies"
+        run: |
+          pip install --upgrade setuptools wheel
+          pip install -r requirements.txt
+          pip install pytest-github-actions-annotate-failures
+
+      - name: "Run tests"
+        run: |
+          curl -L https://github.com/coreruleset/coreruleset/archive/refs/tags/v${{ matrix.crsversion }}.tar.gz -o - | tar xzvf -
+          ./secrules_parser.py -c -f coreruleset-${{ matrix.crsversion }}/rules/*.conf
+

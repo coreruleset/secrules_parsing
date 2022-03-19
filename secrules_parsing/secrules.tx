@@ -1,0 +1,247 @@
+Config:
+    rules*=Rule | comments*=Comment;
+
+/* Add rules as needed.
+Right now, the CRS uses only these ones (obtained using `awk '/Sec/ { print $1; }' *.conf | sort | uniq`):
+
+SecAction
+SecComponentSignature
+SecMarker
+SecRule
+
+*/
+Rule:
+    SecAction | SecRuleScript | SecRule | SecMarker | SecComponentSignature | 
+    SecRuleRemoveById | SecRuleRemoveByTag;
+    
+SecAction:
+    'SecAction' '"' actions+=Action[','] '"';
+
+SecRuleScript:
+    'SecRuleScript' '"'? script=PathNameValue '"'? '"'? actions+=Action[',']? '"'?;
+    
+SecMarker:
+    'SecMarker' '"'? skipTag=SkipTag '"'?;
+
+SecComponentSignature:
+    'SecComponentSignature' '"' signature=Tag '"';
+
+SecRuleRemoveById:
+    'SecRuleRemoveById' ids=IDRangeList;
+
+SecRuleRemoveByTag:
+    'SecRuleRemoveBytag' tag=Tag;
+
+// ActionList can be empty if is the last rule in chain    
+SecRule:
+    'SecRule' variables+=Variable['|'] '"' negated='!'? '@'? operator=Operator '"' '"'? actions+=Action[',']? '"'?;
+    
+IDRangeList:
+    idlist+=ID | range=IDRange;
+
+/*
+There is no chech against collections existance, or typying between variables and value (e.g: TIME_DAY and its referred value must be equal to some integer)
+FILES is a collection, so it doesn't belong here
+*/
+Variable:
+    '!'? ('ARGS_COMBINED_SIZE' | 'ARGS_GET_NAMES' | 'ARGS_NAMES' | 'ARGS_POST_NAMES' |
+    'AUTH_TYPE' | 'DURATION' | 'FILES_COMBINED_SIZE' | 'FILES_NAMES' | 'FILES' | 
+    'FULL_REQUEST' | 'FULL_REQUEST_LENGTH' | 'FILES_SIZES' | 'FILES_TMPNAMES' | 
+    'FILES_TMP_CONTENT' | 'HIGHEST_SEVERITY' | 'INBOUND_DATA_ERROR' | 'MATCHED_VAR_NAME' |
+    'MODSEC_BUILD' | 'MULTIPART_CRLF_LF_LINES' | 'MULTIPART_FILENAME' | 'MULTIPART_NAME' |
+    'MULTIPART_STRICT_ERROR' | 'MULTIPART_UNMATCHED_BOUNDARY' | 'OUTBOUND_DATA_ERROR' | 
+    'PATH_INFO' | 'PERF_ALL' | 'PERF_COMBINED' | 'PERF_GC' | 'PERF_LOGGING' | 'PERF_PHASE1' |
+    'PERF_PHASE2' | 'PERF_PHASE3' | 'PERF_PHASE4' | 'PERF_PHASE5' | 'PERF_SREAD' | 'PERF_SWRITE' |
+    'QUERY_STRING' | 'REMOTE_ADDR' | 'REMOTE_HOST' | 'REMOTE_PORT' | 'REMOTE_USER' |
+    'REQBODY_ERROR' | 'REQBODY_ERROR_MSG' | 'REQBODY_PROCESSOR' | 'REQUEST_BASENAME' |
+    'REQUEST_BODY' | 'REQUEST_BODY_LENGTH' | 'REQUEST_FILENAME' | 'REQUEST_LINE' |
+    'REQUEST_METHOD' | 'REQUEST_PROTOCOL' | 'REQUEST_URI_RAW' |'REQUEST_URI' |
+    'RESPONSE_BODY' | 'RESPONSE_CONTENT_LENGTH' | 'RESPONSE_CONTENT_TYPE' | 'RESPONSE_HEADERS' |
+    'RESPONSE_PROTOCOL' | 'RESPONSE_STATUS' | 'RULE' | 'SCRIPT_BASENAME' | 'SCRIPT_FILENAME' |
+    'SCRIPT_GID' | 'SCRIPT_GROUPNAME' | 'SCRIPT_MODE' | 'SCRIPT_UID' | 'SCRIPT_USERNAME' |
+    'SDBM_DELETE_ERROR' | 'SERVER_ADDR' | 'SERVER_NAME' | 'SERVER_PORT' | 'SESSION' | 'SESSIONID' |
+    'STATUS_LINE' | 'STREAM_INPUT_BODY' | 'STREAM_OUTPUT_BODY' | 'TIME' | 'TIME_DAY' | 'TIME_EPOCH' |
+    'TIME_HOUR' | 'TIME_MIN' | 'TIME_MON' | 'TIME_SEC' | 'TIME_WDAY' | 'TIME_YEAR' | 'UNIQUE_ID' |
+    'URLENCODED_ERROR' | 'USERID' | 'USERAGENT_IP' | 'WEBAPPID' | 'WEBSERVER_ERROR_LOG' |
+    count=Count? collection=CollectionName ':'? collectionArg=CollectionArgument?) |
+    SpecialCollection | 'MATCHED_VAR';
+
+CollectionCount: '&' collection=CollectionName ':' VariableName;
+    
+VariableOrCollection: Variable | CollectionName;
+    
+//    CollectionArgument: AnythingBetweenSlashes | "'"? '/' SlashedRegExp '/' "'"? | VariableName;
+CollectionArgument: AnythingBetweenSingleQuotes | '/' SlashedRegExp '/' | VariableName;
+    
+/* Collections */
+CollectionName:
+    ('ARGS_GET' | 'ARGS_POST' | 'ARGS' | 'ENV' | 'GEO' | 'GLOBAL' | 'IP' | 'MATCHED_VARS_NAMES' |
+    'MATCHED_VARS' | 'PERF_RULES' | 'REQUEST_COOKIES_NAMES' | 'REQUEST_COOKIES' | 'REQUEST_HEADERS_NAMES' |
+    'REQUEST_HEADERS' | 'RESPONSE_HEADERS_NAMES' | 'RULE' | 'SESSION' | 'TX')
+;
+
+SpecialCollection: 'XML' ':' XPathExpression;
+
+XPathExpression: /(\/\*|\/\/@\*)/;
+
+AnythingBetweenSlashes: /(\*|\\\/)+/;
+AnythingBetweenSingleQuotes: /\'.+\'/;
+    
+Count: '&';
+
+//- pattern match (pm/pmf)    
+Operator:
+    ('beginsWith' beginswith=PathOrMacro | 'contains' contains=StringWithMacros | 'containsWord' containsWord=STRING |
+    detectsqli ?= 'detectSQLi' | detectxss ?= 'detectXSS' | 'endsWith' endswith=ExtendedMacro |
+    'fuzzyHash' fuzzyhash=STRING | 'eq' eq=INT | 'ge' ge=Macro | geolookup ?= 'geoLookup'  |
+    'gsbLookup' gsblookup=INT | 'gt' gt=Macro | 'inspectFile' inspectfile=URI | 'ipMatch' ipmatch+=IPCIDR[','] |
+    'ipMatchF' ipmatchf=STRING | 'ipMatchFromFile' ipmatchfromfile=STRING | 'le' le=INT | 'lt' lt=Macro |
+    nomatch ?= 'noMatch' | 'pmf' pmf=PathNameValue | 'pmFromFile' pmfromfile=PathNameValue | 'pm' pm=PatternMatch |
+    'rbl' rbl=Hostname | 'rsub' rsub=AnythingBetweenSlashes | 'rx' rx=RegExp | 'streq' streq=StringWithMacros |
+    'strmatch' strnmatch=STRING | unconditionalmatch ?= 'unconditionalMatch' |
+    'validateByteRange' validatebyterange=ByteRangeList | 'validateDTD' validatedtd=PathNameValue |
+    'validateHash' validatehash=RegExp | 'validateSchema' validateschema=PathNameValue |
+    validateurlencoding ?= 'validateUrlEncoding' | validateutf8encoding ?= 'validateUtf8Encoding' |
+    'verifyCC' verifycc=RegExp | 'verifyCPF' verifycpf=STRING | 'verifySSN' verifyssn=RegExp |
+    'within' within=WithinList | '' rx=RegExp);
+
+/* Actions are separated by ',\' or ',' only */
+//ActionList: actionlist+=;
+/*
+Right now there is no semantics defined for:
+- chaining
+- setting vars
+- skipping.
+Incomplete functionality for:
+- sanitiseMatchedBytes (is boolean or a list of char position begin/end to sanitise
+*/    
+Action:
+    'accuracy:' "'"? accuracy=INT "'"? | disruptiveaction=DisruptiveAction | append ?= 'append' |
+    auditlog ?= 'auditlog' | capture ?= 'capture' |  chain ?= 'chain' | 'ctl:' ctl=TransientAction |
+    'deprecatevar:' deprecatevar=ID | 'exec:' exec=STRING | 'expirevar:' "'"? varname=VariableName '=' Macro "'"? |
+    'id:' "'"? id=INT "'"? | 'initcol:' colname=StandardColName '=' colvalue=Macro |
+    "logdata:" logdata=StringWithMacros | log ?= 'log' | 'maturity:' "'"? maturity=INT "'"? |
+    'msg:' msg=MessageValue | multimatch ?= 'multiMatch'  | noauditlog ?= 'noauditlog' | nolog ?= 'nolog' |
+    'phase:' phase=Phase | 'prepend:' "'"? prepend=STRING "'"? | 'proxy:' proxy=STRING | 'redirect:' redirect=STRING |
+    "rev:" "'"? rev=INT "'"? | 'sanitiseArg:' sanitizearg=ParameterName | sanitizematched ?= 'sanitiseMatched' |
+    'sanitiseMatchedBytes:' sanitizematchedbytes=INT | 'sanitiseRequestHeader:' sanitizerequestheader=STRING |
+    'sanitiseResponseHeader:' sanitizeresponseheader=STRING | 'severity:' severity=Severity |
+    'setuid:' setuid=STRING | 'setrsc:' setrsc=STRING | 'setsid:' setsid=STRING | 'setenv:' setenv=STRING |
+    'setvar:' "'"? '!'? varname=VariableName '='? macro=Macro? "'"? | 'skip:' skip=INT |
+    'skipAfter:' skipafter=SkipTag | 'status:' status=INT | 't:' transformations*=Transformation[','] |
+    "tag:'" tag=Tag "'" | "ver:'" ver=Tag "'" | 'xmlns:' xmlns=STRING;
+
+DisruptiveAction: 'block' | 'accept' | 'deny' | 'drop' | 'pass' | 'pause';
+    
+TransientAction:
+    'auditEngine=' auditEngine=AuditEngineValue | 'auditLogParts=' auditLogParts=AuditLogPartsValue |
+    'debugLogLevel=' debugLog=INT | 'forceRequestBodyVariable=' forceRequestBodyVariable=OnOffValue |
+    'requestBodyAccess=' requestBodyAccess=OnOffValue | 'requestBodyLimit=' requestBodyLimit=INT |
+    'requestBodyProcessor=' requestBodyProcessor=RequestBodyProcessorValue |
+    'responseBodyAccess=' responseBodyAccess=OnOffValue | 'responseBodyLimit=' responseBodyLimit=INT |
+    'ruleEngine=' ruleEngine=RuleEngineValue | 'ruleRemoveById=' ruleRemoveById=RangeINT |
+    'ruleRemoveByMsg=' ruleRemoveByMsg=MessageValue | 'ruleRemoveByTag=' ruleRemoveByTag=Tag |
+    'ruleRemoveTargetById=' ruleRemoveTargetById=RangeINT ';' removeVariable=VariableOrCollection ':'? removeVariableName=VariableName? |
+    'ruleRemoveTargetByMsg=' message=MessageValue ';' removeVariable=VariableOrCollection ':'? removeVariableName=VariableName? |
+    'ruleRemoveTargetByTag=' tagName=Tag ';' removeVariable=VariableOrCollection ':'? removeVariableName=VariableName? |
+    'hashEngine=' | 'hashEnforcement=';
+
+Transformation:
+    'base64Decode'|'sqlHexDecode'|'base64DecodeExt'|'base64Encode'|'cmdLine'|'compressWhitespace'|'cssDecode'|
+    'escapeSeqDecode'|'hexDecode'|'hexEncode'|'htmlEntityDecode'|'jsDecode'|'length'|'lowercase'|'md5'|'none'|
+    'normalisePathWin'|'normalizePathWin'|'normalisePath'|'normalizePath'|'parityEven7bit'|'parityOdd7bit'|
+    'parityZero7bit'|'removeNulls'|'removeWhitespace'|'replaceComments'|'removeCommentsChar'|'removeComments'|
+    'replaceNulls'|'urlDecodeUni'|'urlDecode'|'uppercase'|'urlEncode'|'utf8toUnicode'|'sha1'|'trimLeft'|
+    'trimRight'|'trim';
+
+        
+/* This is to take rule continuations (\\n) as comments */    
+Comment[ws='\t ']:
+    /\\\n|^\#.*$/;
+
+/* Tags for jumping from rules e.g: END-DRUPAL-RULE-EXCLUSIONS */    
+SkipTag: /[A-Z0-9-_]+/;
+
+VariableName: 'tx.' MacroVar '-'? Tag? '-'? MacroVar? | /[A-Za-z0-9_\-\.\/\[\]]+/;
+
+Phase: /[0-5]/ | 'request' | 'response' | 'logging';
+
+//Aho-Corasick
+PatternMatch: /((\\")|[^"])*/;
+    
+// For tags in rules: OWASP_CRS/POLICY/METHOD_NOT_ALLOWED
+Tag: /[A-Za-z0-9\/\-_\.\/]+/;
+// Byte Range now is a list of integers, must be a range (allow 1-10).
+ByteRangeList: byterange*=RangeINT[','];
+
+RangeINT: INT '-' INT | INT;
+    
+// Should match ips
+IPCIDR: /[0-9a-f\.\:]+/;
+
+// Single Quote delimited STRING
+SQDelimitedSTRING: "'" msg=MessageValue? ':'? macro=MacroVar? "'";
+// This string has macros inside, but their value isn't stored in a variable for now.
+StringWithMacros: "'" ExtendedMacro "'";
+// String with spaces: when using streq, there are places where a request line is tested
+StringWithSpaces: /[A-Za-z0-9\-\/\ \._]+/;
+
+PathOrMacro: PathNameValue | MacroVar;
+    
+// Filesystem Paths (could be merged with URI, tought)    
+PathNameValue: /[a-z0-9\-_\.\/]+/;
+
+// Macros, e.g: %{tx.critical_anomaly_score}
+Macro:  INT | OperationMacro | ExtendedMacro | MacroVar;
+
+// This extended macro are a little bag of holding...
+ExtendedMacro: /[A-Za-z0-9S\-\_\.\:\ \/\%\{\}\|\+=#?]+/;
+    
+OperationMacro: ('+' | '-') var=MacroVar;
+
+MacroVar: '%{'? /[a-zA-Z0-9-\_\.]+/ '}'?;
+
+WithinList: wlist+=ExtendedMacro[' '];
+
+MacroOrString: StringWithSpaces | MacroVar;
+
+/* Messages are textual sentences, e.g.: "This is bad"
+Most of the special characters appear on modsecurity_crs configuracion on rule 901001
+*/    
+//MessageValue: "'" /[A-Z0-9a-z\!\-,\.\%\:\_\\\(\)\{\}\/ ]+/ "'";
+MessageValue: "'" /((\\')|[^\'])*/ "'";
+
+/* There are two kinds of regexp
+For variables, use SlashedRegExp (these don't have ")
+For operations, use RegExp as these have \"
+*/
+RegExp: /((\\")|[^"])*/;
+    
+SlashedRegExp: /[^\/]+/;
+/*
+A rules ID Range: 920000-920010
+*/    
+IDRange: /"[0-9]+-[0-9]+"/;
+
+// URI path, tipically used in beginsWith, contains, etc.
+URI: /\/[a-zA-Z0-9-_\.\/]+/;
+
+Hostname: /[a-z][a-zA-Z0-9-_\.\/]+/;
+
+ParameterName: /[a-zA-Z0-9\-\-]+/;
+
+StandardColName: 'global' | 'ip';
+
+/* Enumerated values */
+OnOffValue: 'On' | 'Off' | 'on' | 'off';
+
+AuditEngineValue: OnOffValue | 'RelevantOnly';
+
+RuleEngineValue: OnOffValue | 'DetectionOnly';
+
+// Can this be used multiple times, e.g.: +AC?
+AuditLogPartsValue: /(\+|-)[A-Z]/;
+
+RequestBodyProcessorValue: 'text/xml' | 'text/json' | 'URLENCODED' | 'JSON' | 'MULTIPART' | 'XML';
+
+Severity: "'"? ('ALERT' | 'CRITICAL' | 'EMERGENCY' | 'ERROR' | 'NOTICE' | 'WARNING') "'"?;

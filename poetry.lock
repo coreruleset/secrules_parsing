@@ -1,0 +1,42 @@
+[[package]]
+name = "arpeggio"
+version = "1.10.2"
+description = "Packrat parser interpreter"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.extras]
+dev = ["wheel", "mkdocs", "mike", "twine"]
+test = ["flake8", "coverage", "coveralls", "pytest"]
+
+[[package]]
+name = "textx"
+version = "2.3.0"
+description = "Meta-language for DSL implementation inspired by Xtext"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+Arpeggio = ">=1.9.0"
+
+[package.extras]
+cli = ["click (>=7.0,<8.0)"]
+dev = ["textx-dev", "click (>=7.0,<8.0)", "mkdocs", "mike", "twine"]
+test = ["click (>=7.0,<8.0)", "flake8", "tox", "jinja2", "coverage", "coveralls", "pytest", "html5lib"]
+
+[metadata]
+lock-version = "1.1"
+python-versions = "^3.6"
+content-hash = "ea9fbe9d7f16a861081d88a9c1a43d31fb520beb14831f6a1f91f0fb81df3325"
+
+[metadata.files]
+arpeggio = [
+    {file = "Arpeggio-1.10.2-py2.py3-none-any.whl", hash = "sha256:fed68a1cb7f529cbd4d725597cc811b7506885fcdef17d4cdcf564341a1e210b"},
+    {file = "Arpeggio-1.10.2.tar.gz", hash = "sha256:bfe349f252f82f82d84cb886f1d5081d1a31451e6045275e9f90b65d0daa06f1"},
+]
+textx = [
+    {file = "textX-2.3.0-py2.py3-none-any.whl", hash = "sha256:f24aa485580ea5f81020b3a1af32760155f889a83490822e94159664c2bf5c8d"},
+    {file = "textX-2.3.0.tar.gz", hash = "sha256:265afc12d4ae421a7794c8cdc58c6eed44cc879f078cb54c32d5dc6bc74efbac"},
+]

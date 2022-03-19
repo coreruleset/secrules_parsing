@@ -1,3 +1,1 @@
-textX>=1.5.0
-jsonpickle>=0.8.0
-PyYAML>=3.12
+textX>=2.3.0

@@ -1,0 +1,36 @@
+[tool.poetry]
+name = "secrules_parsing"
+version = "0.1.0"
+description = "ModSecurity DSL Parser package using textX"
+authors = [
+    "Felipe Zipitria <felipe.zipitria@owasp.org>"
+]
+license = "Apache-2.0"
+readme = "README.md"
+homepage = "https://github.com/coreruleset/secrules_parsing"
+repository = "https://github.com/coreruleset/secrules_parsing"
+documentation = "https://github.com/coreruleset/secrules_parsing"
+
+keywords = ["packaging", "dependency", "infer", "pyproject.toml"]
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/coreruleset/secrules_parsing/issues"
+
+# Requirements
+[tool.poetry.dependencies]
+python = "^3.6"
+textX = "^2.3.0"
+
+[tool.poetry.scripts]
+secrules-parser = 'secrules_parsing.parser:run'
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+

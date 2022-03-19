@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-""""
+"""
 SecRules CRS Parser
 -----------------------------------------------
 
@@ -28,18 +28,20 @@ def parse_args():
     cmdline.add_argument('-v', '--verbose', help='Print verbose messages', action="store_true")
     cmdline.add_argument('-d', '--debug', help='You don\'t want to do this!', action="store_true")
     cmdline.add_argument('-o', '--output', metavar='FILE', help='Output results to file')
+    cmdline.add_argument('--output-type', default='plain', choices=['plain', 'github'], 
+                        help='Format results for this output. Default "plain".')
     myargs = cmdline.parse_args()
     return myargs
 
 
-def process_rules(files, verbose=False):
+def process_rules(files, verbose=False, debug=False):
     """ Parse our rule files with the provided parser """
     models = []
     # Load Meta-Model
     resource_package = __name__
     resource_path = '/'.join(['secrules.tx'])
     template = pkg_resources.resource_filename(resource_package, resource_path)
-    modsec_mm = metamodel_from_file(template, memoization=True)
+    modsec_mm = metamodel_from_file(template, memoization=True, debug=debug)
     # Register test processor
     modsec_mm.register_obj_processors({'SecRule': secrule_id_processor})
     # Make sure we don't have an empty list of files
@@ -51,7 +53,12 @@ def process_rules(files, verbose=False):
         try:
             model = modsec_mm.model_from_file(rule_file)
         except TextXSyntaxError as e:
-            model = {"Error":"Syntax error in line %d col %d: %s" % (e.line, e.col, e.message)}
+            model = {
+                "file": rule_file,
+                "line": e.line,
+                "col": e.col,
+                "message": e.message
+                }
         models.append(model)
     return models
 
@@ -65,7 +72,7 @@ def call_activites(args, models):
     """ For firing actions based on CLI args """
     exitcode = 0
     if args.correctness:
-        exitcode = get_correctness(args.files, models)
+        exitcode = get_correctness(args.files, args.output_type, models)
     if args.regex:
         regexs = {}
         for file_index in range(0, len(args.files)):
@@ -109,21 +116,30 @@ def get_rule_regex(rule):
         return None
 
 
-def get_correctness(files, models):
+def get_correctness(files, output_type, models):
     """ Checks the correctness of a given rules file """
     exitcode = 0
     for file_index in range(0, len(files)):
         if isinstance(models[file_index], dict):
-            print("Syntax invalid: %s" % models[file_index])
+            e = models[file_index]
+            if output_type == "github":
+                print(f"::error file={e['file']},line={e['line']},col={e['col']},title='Syntax invalid'::{e['message']}")
+            else:
+                print(f"Syntax invalid: Syntax error in line {e['line']} col {e['col']}: {e['message']}")
             exitcode = 1
         else:
             print("Syntax OK: %s" % (files[file_index]))
     return exitcode
 
 
-if __name__ == "__main__":
+def run():
+    """ Runs the example parser """
     args = parse_args()
     create_output(args.output)
-    models = process_rules(args.files, args.verbose)
+    models = process_rules(args.files, args.verbose, args.debug)
     exitcode = call_activites(args, models)
     sys.exit(exitcode)
+
+if __name__ == "__main__":
+    run()
+

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "secrules-parsing"
-version = "0.2.3"
+version = "0.2.4"
 description = "ModSecurity DSL Parser package using textX"
 authors = [
     "Felipe Zipitria <felipe.zipitria@owasp.org>"

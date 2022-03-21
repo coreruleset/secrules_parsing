@@ -28,7 +28,8 @@ jobs:
 
       - name: "Run tests"
         run: |
-          curl -L https://github.com/coreruleset/coreruleset/archive/refs/tags/v${{ matrix.crsversion }}.tar.gz -o - | tar xzvf -
+          curl -L https://github.com/coreruleset/coreruleset/archive/refs/tags/v${{ matrix.crsversion }}.tar.gz -o - | tar xzvf - --strip-components=1 --wildcards "*/rules/*"
           poetry install
-          poetry run secrules-parser -c --output-type github -f coreruleset-${{ matrix.crsversion }}/rules/*.conf
+          poetry run pytest -vs
+          poetry run secrules-parser -c --output-type github -f rules/*.conf
 

@@ -9,11 +9,11 @@ Incomplete parser model and sample application for parsing [Core Rule Set](https
 
     System-wide:
     ```shell
-    sudo pip install -r requirements.txt
+    sudo pip install secrules-parsing
     ```
     User:
     ```shell
-    pip install --user -r requirements.txt
+    pip install --user secrules-parsing
     ```
 2. Execute `secrules-parser` specifying the location of the files you want to scan using the -f/--files argument. This takes wildcards or individual files.
    `$ secrules-parser -c -f /owasp-crs/rules/*.conf`

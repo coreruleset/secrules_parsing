@@ -16,16 +16,36 @@ import argparse
 from textx.metamodel import metamodel_from_file, metamodel_from_str
 from textx.exceptions import TextXSyntaxError
 import json
+from inspect import getmembers
 from secrules_parsing.resources import get_model
+from secrules_parsing.classes.operator import Operator, OperatorType
+from secrules_parsing.classes.action import Action, ActionType
+from secrules_parsing.classes.variable import Variable
+from secrules_parsing.classes.collection import Collection
+from secrules_parsing.classes.secrule import SecRule
+from secrules_parsing.exceptions.Parser import ParserException
 
 
 def process_rules(files, verbose=False, debug=False):
     """Parse our rule files with the provided parser"""
     models = []
     template = get_model()
-    modsec_mm = metamodel_from_file(template, memoization=True, debug=debug)
+    modsec_mm = metamodel_from_file(
+        template,
+        memoization=True,
+        debug=debug,
+        classes=[
+            SecRule,
+            Operator,
+            OperatorType,
+            Variable,
+            Action,
+            ActionType,
+            Collection,
+        ],
+    )
     # Register test processor
-    modsec_mm.register_obj_processors({"SecRule": secrule_id_processor})
+    # modsec_mm.register_obj_processors({"SecRule": secrule_id_processor})
     # Make sure we don't have an empty list of files
     if files == []:
         return models
@@ -98,17 +118,30 @@ def process_from_str(str, verbose=False, debug=False):
     """Parse SecLanguage from string"""
     models = []
     template = get_model()
-    modsec_mm = metamodel_from_file(template, memoization=True, debug=debug)
+    modsec_mm = metamodel_from_file(
+        template,
+        memoization=True,
+        debug=debug,
+        classes=[
+            SecRule,
+            Operator,
+            OperatorType,
+            Variable,
+            Action,
+            ActionType,
+            Collection,
+        ],
+    )
     # Register test processor
     modsec_mm.register_obj_processors({"SecRule": secrule_id_processor})
     # Make sure we don't have an empty list of files
     try:
         model = modsec_mm.model_from_str(str)
     except TextXSyntaxError as e:
-        model = {
-            "file": rule_file,
-            "line": e.line,
-            "col": e.col,
-            "message": e.message,
-        }
+        raise ParserException(
+            line=e.line,
+            column=e.col,
+            message=e.message,
+        )
+
     return model

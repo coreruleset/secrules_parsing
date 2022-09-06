@@ -76,8 +76,8 @@ CollectionArgument: AnythingBetweenSingleQuotes | '/' SlashedRegExp '/' | Variab
 /* Collections */
 CollectionName:
     ('ARGS_GET' | 'ARGS_POST' | 'ARGS' | 'ENV' | 'GEO' | 'GLOBAL' | 'IP' | 'MATCHED_VARS_NAMES' |
-    'MATCHED_VARS' | 'PERF_RULES' | 'REQUEST_COOKIES_NAMES' | 'REQUEST_COOKIES' | 'REQUEST_HEADERS_NAMES' |
-    'REQUEST_HEADERS' | 'RESPONSE_HEADERS_NAMES' | 'RULE' | 'SESSION' | 'TX')
+    'MATCHED_VARS' | 'MULTIPART_PART_HEADERS' | 'PERF_RULES' | 'REQUEST_COOKIES_NAMES' | 'REQUEST_COOKIES' |
+    'REQUEST_HEADERS_NAMES' | 'REQUEST_HEADERS' | 'RESPONSE_HEADERS_NAMES' | 'RULE' | 'SESSION' | 'TX')
 ;
 
 SpecialCollection: 'XML' ':' XPathExpression;

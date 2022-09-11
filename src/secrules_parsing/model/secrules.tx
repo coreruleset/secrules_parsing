@@ -34,7 +34,7 @@ SecRuleRemoveByTag:
 
 // ActionList can be empty if is the last rule in chain    
 SecRule:
-    'SecRule' variables+=Variable['|'] '"' negated='!'? '@'? operator=Operator '"' '"'? actions+=Action[',']? '"'?;
+    'SecRule' variables+=Variable['|'] '"' negated='!'? '@'?- operator=Operator '"' '"'? actions+=Action[',']? '"'?;
     
 IDRangeList:
     idlist+=ID | range=IDRange;
@@ -91,7 +91,7 @@ Count: '&';
 
 //- pattern match (pm/pmf)    
 Operator:
-    ('beginsWith' beginswith=PathOrMacro | 'contains' contains=StringWithMacros | 'containsWord' containsWord=STRING |
+    ('beginsWith' beginswith=PathOrMacro | 'contains' contains=PatternMatch | 'containsWord' containsWord=STRING |
     detectsqli ?= 'detectSQLi' | detectxss ?= 'detectXSS' | 'endsWith' endswith=ExtendedMacro |
     'fuzzyHash' fuzzyhash=STRING | 'eq' eq=INT | 'ge' ge=Macro | geolookup ?= 'geoLookup'  |
     'gsbLookup' gsblookup=INT | 'gt' gt=Macro | 'inspectFile' inspectfile=URI | 'ipMatch' ipmatch+=IPCIDR[','] |

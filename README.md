@@ -93,6 +93,15 @@ models = parser.process_rules(files)
 parser.get_correctness(files, models)
 ```
 
+## Development
+
+If you want to modify this module, follow these steps:
+1. Clone this repository: `git clone git@github.com:coreruleset/secrules_parsing.git`
+1. Do not forget to install dependencies using [poetry](https://python-poetry.org/docs/): `poetry install` first!
+1. Edit and change the files you want.
+1. Write tests! Tests are in the `tests` subdirectory
+1. Create a PR [here](https://github.com/coreruleset/secrules_parsing/compare), and ask for review!
+
 ## Misc
 
 To visualize the syntax tree, use:

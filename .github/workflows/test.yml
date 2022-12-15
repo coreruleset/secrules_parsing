@@ -9,27 +9,28 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        crsversion: ['3.3.0', '3.2.0']
-        poetry-version: ['1.1.13']
-        python-version: ['3.7', '3.8', '3.9', '3.10']
+        crsversion: ['3.3.4', '3.2.1']
+        poetry-version: ['1.1.15']
+        python-version: ['3.8', '3.9', '3.10']
 
     steps:
       - name: "Checkout repo"
         uses: actions/checkout@v3
 
       - name: Set up Python 3
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+
       - name: Install poetry
-        uses: abatilo/actions-poetry@v2.0.0
+        uses: abatilo/actions-poetry@v2
         with:
           poetry-version: ${{ matrix.poetry-version }}
 
       - name: "Run tests"
         run: |
           curl -L https://github.com/coreruleset/coreruleset/archive/refs/tags/v${{ matrix.crsversion }}.tar.gz -o - | tar xzvf - --strip-components=1 --wildcards "*/rules/*"
-          poetry install
+          poetry install -v
           poetry run pytest -vs
           poetry run secrules-parser -c --output-type github -f rules/*.conf
 

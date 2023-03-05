@@ -190,7 +190,7 @@ StringWithSpaces: /[A-Za-z0-9\-\/\ \._]+/;
 PathOrMacro: PathNameValue | MacroVar;
     
 // Filesystem Paths (could be merged with URI, tought)    
-PathNameValue: /[a-z0-9\-_\.\/]+/;
+PathNameValue: /[a-zA-Z0-9\-_\.\/]+/;
 
 // Macros, e.g: %{tx.critical_anomaly_score}
 Macro:  INT | OperationMacro | ExtendedMacro | MacroVar;

@@ -12,7 +12,7 @@ SecRule
 */
 Rule:
     SecAction | SecRuleScript | SecRule | SecMarker | SecComponentSignature | 
-    SecRuleRemoveById | SecRuleRemoveByTag;
+    SecRuleRemoveById | SecRuleRemoveByTag | SecRuleUpdateTargetByTag;
     
 SecAction:
     'SecAction' '"' actions+=Action[','] '"';
@@ -32,6 +32,9 @@ SecRuleRemoveById:
 SecRuleRemoveByTag:
     'SecRuleRemoveBytag' tag=Tag;
 
+SecRuleUpdateTargetByTag:
+    'SecRuleUpdateTargetByTag' '"'? tag=Tag '"'? '"'? negated='!'? variables=Variable '"'?;
+
 // ActionList can be empty if is the last rule in chain    
 SecRule:
     'SecRule' variables+=Variable['|'] '"' negated='!'? '@'?- operator=Operator '"' '"'? actions+=Action[',']? '"'?;
@@ -40,7 +43,7 @@ IDRangeList:
     idlist+=ID | range=IDRange;
 
 /*
-There is no chech against collections existance, or typying between variables and value (e.g: TIME_DAY and its referred value must be equal to some integer)
+There is no check against collections existance, or typying between variables and value (e.g: TIME_DAY and its referred value must be equal to some integer)
 FILES is a collection, so it doesn't belong here
 */
 Variable:

@@ -12,7 +12,7 @@ SecRule
 */
 Rule:
     SecAction | SecRuleScript | SecRule | SecMarker | SecComponentSignature | 
-    SecRuleRemoveById | SecRuleRemoveByTag | SecRuleUpdateTargetByTag;
+    SecRuleRemoveById | SecRuleRemoveByTag | SecRuleUpdateTargetById | SecRuleUpdateTargetByTag;
     
 SecAction:
     'SecAction' '"' actions+=Action[','] '"';
@@ -31,6 +31,9 @@ SecRuleRemoveById:
 
 SecRuleRemoveByTag:
     'SecRuleRemoveBytag' tag=Tag;
+
+SecRuleUpdateTargetById:
+    'SecRuleUpdateTargetById' ids=ID '"'? negated='!'? variables=Variable '"'?;
 
 SecRuleUpdateTargetByTag:
     'SecRuleUpdateTargetByTag' '"'? tag=Tag '"'? '"'? negated='!'? variables=Variable '"'?;
@@ -225,6 +228,10 @@ For operations, use RegExp as these have \"
 RegExp: /((\\")|[^"])*/;
     
 SlashedRegExp: /[^\/]+/;
+
+// A rule ID
+ID: /\d{6}/;
+
 /*
 A rules ID Range: 920000-920010
 */    

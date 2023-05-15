@@ -33,7 +33,7 @@ SecRuleRemoveByTag:
     'SecRuleRemoveBytag' tag=Tag;
 
 SecRuleUpdateTargetById:
-    'SecRuleUpdateTargetById' ids=ID '"'? negated='!'? variables=Variable '"'?;
+    'SecRuleUpdateTargetById' id=INT '"'? negated='!'? variables=Variable '"'?;
 
 SecRuleUpdateTargetByTag:
     'SecRuleUpdateTargetByTag' '"'? tag=Tag '"'? '"'? negated='!'? variables=Variable '"'?;
@@ -43,7 +43,7 @@ SecRule:
     'SecRule' variables+=Variable['|'] '"' negated='!'? '@'?- operator=Operator '"' '"'? actions+=Action[',']? '"'?;
     
 IDRangeList:
-    idlist+=ID | range=IDRange;
+    idlist+=INT | range=IDRange;
 
 /*
 There is no check against collections existance, or typying between variables and value (e.g: TIME_DAY and its referred value must be equal to some integer)
@@ -228,9 +228,6 @@ For operations, use RegExp as these have \"
 RegExp: /((\\")|[^"])*/;
     
 SlashedRegExp: /[^\/]+/;
-
-// A rule ID
-ID: /\d{6}/;
 
 /*
 A rules ID Range: 920000-920010

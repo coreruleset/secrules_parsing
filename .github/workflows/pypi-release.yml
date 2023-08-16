@@ -1,0 +1,23 @@
+name: Publish to PyPI
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Publish to pypi.org? (will not work from forks!)"
+        required: false
+        default: 'false'
+
+jobs:
+  test:
+    name: Test Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish to pypi
+        uses: coveooss/pypi-publish-with-poetry@v1.0.0
+        with:
+          project-name: secrules-parsing
+          pypi-token: ${{ secrets.PYPI_TOKEN }}
+          pre-release: ${{ github.ref != 'refs/heads/master' }}
+          dry-run: ${{ github.ref != 'refs/heads/master' && github.event.inputs.publish != 'true' }}

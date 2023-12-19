@@ -2,4 +2,4 @@ arpeggio==1.10.2
 importlib-metadata==4.11.3; python_version >= "3.7"
 textx==2.3.0
 typing-extensions==4.1.1; python_version < "3.8" and python_version >= "3.7"
-zipp==3.7.0; python_version >= "3.7"
+zipp==3.17.0; python_version >= "3.7"

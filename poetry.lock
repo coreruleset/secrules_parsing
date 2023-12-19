@@ -153,21 +153,21 @@ testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "pygments (>=2.
 
 [[package]]
 name = "textx"
-version = "2.3.0"
+version = "3.1.1"
 description = "Meta-language for DSL implementation inspired by Xtext"
 optional = false
 python-versions = "*"
 files = [
-    {file = "textX-2.3.0-py2.py3-none-any.whl", hash = "sha256:f24aa485580ea5f81020b3a1af32760155f889a83490822e94159664c2bf5c8d"},
-    {file = "textX-2.3.0.tar.gz", hash = "sha256:265afc12d4ae421a7794c8cdc58c6eed44cc879f078cb54c32d5dc6bc74efbac"},
+    {file = "textX-3.1.1-py2.py3-none-any.whl", hash = "sha256:1f2bd936309f5f9092567e3f5a0c513d8292d5852c63a72096fe5a57018d0f50"},
+    {file = "textX-3.1.1.tar.gz", hash = "sha256:e2fb7d090ea4a71f8bf2f0303770275c42a5f73854b4e7f6adfcdbe368fab0fa"},
 ]
 
 [package.dependencies]
-Arpeggio = ">=1.9.0"
+Arpeggio = ">=2.0.0"
 
 [package.extras]
 cli = ["click (>=7.0,<8.0)"]
-dev = ["click (>=7.0,<8.0)", "mike", "mkdocs", "textX-dev", "twine"]
+dev = ["click (>=7.0,<8.0)", "mike", "mkdocs", "setuptools-scm", "textX-dev", "twine"]
 test = ["click (>=7.0,<8.0)", "coverage", "coveralls", "flake8", "html5lib", "jinja2", "pytest", "tox"]
 
 [[package]]
@@ -221,4 +221,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.7,<4.0"
-content-hash = "a512832a9b9cdf72b1ab2f4497ddca8098d5c81cb5d4e9743c0d39bbaf171524"
+content-hash = "2ccbf6878a0fa746a035ec84db182c3236727119bab9ec874d45f85257d673d5"

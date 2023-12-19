@@ -30,7 +30,7 @@ packages = [
 [tool.poetry.dependencies]
 python = ">=3.7,<4.0"
 textX = "^2.3.0"
-importlib-metadata = "^4.11.3"
+importlib-metadata = ">=4.11.3,<7.0.0"
 
 [tool.poetry.scripts]
 secrules-parser = 'secrules_parsing.cli:run'

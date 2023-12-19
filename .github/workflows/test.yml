@@ -9,13 +9,13 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        crsversion: ['3.3.4', '3.2.1']
-        poetry-version: ['1.4.2']
+        crsversion: ['3.3.6', '3.2.1']
+        poetry-version: ['1.7.0']
         python-version: ['3.8', '3.9', '3.10']
 
     steps:
       - name: "Checkout repo"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python 3
         uses: actions/setup-python@v4

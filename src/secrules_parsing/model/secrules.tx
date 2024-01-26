@@ -169,7 +169,7 @@ Comment[ws='\t ']:
 /* Tags for jumping from rules e.g: END-DRUPAL-RULE-EXCLUSIONS */    
 SkipTag: /[A-Za-z0-9._-]+/;
 
-VariableName: 'tx.' MacroVar '-'? Tag? '-'? MacroVar? | /[A-Za-z0-9_\-\.\/\[\]]+/;
+VariableName: 'tx.' MacroVar '-'? Tag? '-'? MacroVar? | /[A-Za-z0-9_\-\.\/\[\]$]+/;
 
 Phase: /[0-5]/ | 'request' | 'response' | 'logging';
 

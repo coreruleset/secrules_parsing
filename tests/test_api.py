@@ -55,3 +55,27 @@ def test_operator_contains_works_with_greater_than() -> None:
     for rule in parsed_rule.rules:
         assert rule.__class__.__name__ == "SecRule"
         assert rule.operator.contains == "-->"
+
+def test_collection_argument_with_dollar() -> None:
+    """Test that a collection argument can contain `$` (e.g., a key in a JSON document)"""
+    rule_text = """
+    SecRule REQUEST_FILENAME "@rx /apps/mail/api/messages/[0-9]+/flags$" \
+    "id:9508978,\
+    phase:1,\
+    pass,\
+    t:none,\
+    nolog,\
+    ver:'nextcloud-rule-exclusions-plugin/1.0.0',\
+    ctl:ruleRemoveTargetById=942290;ARGS_NAMES:json.flags.$notjunk,\
+    setvar:'tx.allowed_methods=%{tx.allowed_methods} PUT'"
+    """
+
+    parsed_rule = parser.process_from_str(rule_text)
+    matched = False
+    for rule in parsed_rule.rules:
+        assert rule.__class__.__name__ == "SecRule"
+        for action in rule.actions:
+            if action.ctl:
+                matched = True
+                assert action.ctl.ruleRemoveTargetById == 942290
+                assert action.ctl.removeVariableName == "json.flags.$notjunk"

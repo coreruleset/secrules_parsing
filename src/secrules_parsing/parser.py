@@ -106,7 +106,6 @@ def process_from_str(str, verbose=False, debug=False):
         model = modsec_mm.model_from_str(str)
     except TextXSyntaxError as e:
         model = {
-            "file": rule_file,
             "line": e.line,
             "col": e.col,
             "message": e.message,

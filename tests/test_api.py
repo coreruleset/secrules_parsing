@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import glob
 import os
-import pprint
 import re
 
 from secrules_parsing import parser
@@ -84,7 +83,8 @@ def test_collection_argument_with_dollar() -> None:
                 assert action.ctl.removeVariableName == "json.flags.$notjunk"
 
 def test_lowercase_and_uppercase_in_argument() -> None:
-    """Test that a collection argument can contain `$` (e.g., a key in a JSON document)"""
+    """ Example test showing how to find if a rule has a lowercase transformation, then see if the target
+    of the rule has an uppercase regex. """
     rule_text = """
     SecRule REQUEST_FILENAME "@rx /[ABCD]+/$" \
     "id:1234,\
@@ -94,14 +94,19 @@ def test_lowercase_and_uppercase_in_argument() -> None:
     nolog
     """
 
-    uppercase_regex = re.compile('/[A-Z]/')
+    matched = False
+    uppercase_regex = re.compile('[A-Z]')
     parsed_rule = parser.process_from_str(rule_text)
     for rule in parsed_rule.rules:
         assert rule.__class__.__name__ == "SecRule"
         for action in rule.actions:
-            pprint.pprint(action)
             if action.transformations:
                 for t in action.transformations:
                     if t == "lowercase":
-                        pprint.pprint(rule)
-                        assert not uppercase_regex.match(rule.operator.rx)
+                        if uppercase_regex.match(rule.operator.rx):
+                            matched = True
+                            assert True, ("Regex tries to match uppercase, "
+                                          "but you are transforming into lowercase so it will "
+                                          "never match")
+
+    assert matched

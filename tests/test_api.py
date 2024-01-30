@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import glob
 import os
+import re
+
 from secrules_parsing import parser
 
 
@@ -16,7 +18,7 @@ def test_api() -> None:
 def test_model_parse() -> None:
     """Test that we can parse the model correctly"""
     rule_text = """
-    SecRule ARGS "@rx found" "id:1,log,noauditlog,t:lowercase,block" 
+    SecRule ARGS "@rx found" "id:1,log,noauditlog,t:lowercase,block"
     """
     parsed_rule = parser.process_from_str(rule_text)
     # print(ppretty(parsed_rule, depth=10))
@@ -56,6 +58,7 @@ def test_operator_contains_works_with_greater_than() -> None:
         assert rule.__class__.__name__ == "SecRule"
         assert rule.operator.contains == "-->"
 
+
 def test_collection_argument_with_dollar() -> None:
     """Test that a collection argument can contain `$` (e.g., a key in a JSON document)"""
     rule_text = """
@@ -79,3 +82,35 @@ def test_collection_argument_with_dollar() -> None:
                 matched = True
                 assert action.ctl.ruleRemoveTargetById == 942290
                 assert action.ctl.removeVariableName == "json.flags.$notjunk"
+
+    assert matched
+
+
+def test_lowercase_and_uppercase_in_argument() -> None:
+    """ Example test showing how to find if a rule has a lowercase transformation, then see if the target
+    of the rule has an uppercase regex. """
+    rule_text = """
+    SecRule REQUEST_FILENAME "@rx /[ABCD]+/$" \
+    "id:1234,\
+    phase:1,\
+    pass,\
+    t:lowercase,\
+    nolog
+    """
+
+    matched = False
+    uppercase_regex = re.compile(r"[A-Z]")
+    parsed_rule = parser.process_from_str(rule_text)
+    for rule in parsed_rule.rules:
+        assert rule.__class__.__name__ == "SecRule"
+        for action in rule.actions:
+            if action.transformations:
+                for t in action.transformations:
+                    if t == "lowercase":
+                        if uppercase_regex.search(rule.operator.rx):
+                            matched = True
+                            assert True, ("Regex tries to match uppercase, "
+                                          "but you are transforming into lowercase so it will "
+                                          "never match")
+
+    assert matched

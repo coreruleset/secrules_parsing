@@ -50,7 +50,7 @@ There is no check against collections existance, or typying between variables an
 FILES is a collection, so it doesn't belong here
 */
 Variable:
-    '!'? ('ARGS_COMBINED_SIZE' | 'ARGS_GET_NAMES' | 'ARGS_NAMES' | 'ARGS_POST_NAMES' |
+    '!'? '&'? ('ARGS_COMBINED_SIZE' | 'ARGS_GET_NAMES' | 'ARGS_NAMES' | 'ARGS_POST_NAMES' |
     'AUTH_TYPE' | 'DURATION' | 'FILES_COMBINED_SIZE' | 'FILES_NAMES' | 'FILES' | 
     'FULL_REQUEST' | 'FULL_REQUEST_LENGTH' | 'FILES_SIZES' | 'FILES_TMPNAMES' | 
     'FILES_TMP_CONTENT' | 'HIGHEST_SEVERITY' | 'INBOUND_DATA_ERROR' | 'MATCHED_VAR_NAME' |
@@ -69,11 +69,9 @@ Variable:
     'STATUS_LINE' | 'STREAM_INPUT_BODY' | 'STREAM_OUTPUT_BODY' | 'TIME' | 'TIME_DAY' | 'TIME_EPOCH' |
     'TIME_HOUR' | 'TIME_MIN' | 'TIME_MON' | 'TIME_SEC' | 'TIME_WDAY' | 'TIME_YEAR' | 'UNIQUE_ID' |
     'URLENCODED_ERROR' | 'USERID' | 'USERAGENT_IP' | 'WEBAPPID' | 'WEBSERVER_ERROR_LOG' |
-    count=Count? collection=CollectionName ':'? collectionArg=CollectionArgument?) |
+    collection=CollectionName ':'? collectionArg=CollectionArgument?) |
     SpecialCollection | 'MATCHED_VAR';
 
-CollectionCount: '&' collection=CollectionName ':' VariableName;
-    
 VariableOrCollection: Variable | CollectionName;
     
 //    CollectionArgument: AnythingBetweenSlashes | "'"? '/' SlashedRegExp '/' "'"? | VariableName;
@@ -94,8 +92,6 @@ XPathExpression: /(\/\*|\/\/@\*)/;
 AnythingBetweenSlashes: /(\*|\\\/)+/;
 AnythingBetweenSingleQuotes: /\'.+\'/;
     
-Count: '&';
-
 //- pattern match (pm/pmf)    
 Operator:
     ('beginsWith' beginswith=PathOrMacro | 'contains' contains=PatternMatch | 'containsWord' containsWord=STRING |

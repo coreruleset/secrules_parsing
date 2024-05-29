@@ -60,7 +60,7 @@ Variable:
     'PERF_PHASE2' | 'PERF_PHASE3' | 'PERF_PHASE4' | 'PERF_PHASE5' | 'PERF_SREAD' | 'PERF_SWRITE' |
     'QUERY_STRING' | 'REMOTE_ADDR' | 'REMOTE_HOST' | 'REMOTE_PORT' | 'REMOTE_USER' |
     'REQBODY_ERROR' | 'REQBODY_ERROR_MSG' | 'REQBODY_PROCESSOR' | 'REQUEST_BASENAME' |
-    'REQUEST_BODY' | 'REQUEST_BODY_LENGTH' | 'REQUEST_FILENAME' | 'REQUEST_LINE' |
+    'REQUEST_BODY_LENGTH' | 'REQUEST_BODY' | 'REQUEST_FILENAME' | 'REQUEST_LINE' |
     'REQUEST_METHOD' | 'REQUEST_PROTOCOL' | 'REQUEST_URI_RAW' |'REQUEST_URI' |
     'RESPONSE_BODY' | 'RESPONSE_CONTENT_LENGTH' | 'RESPONSE_CONTENT_TYPE' |
     'RESPONSE_PROTOCOL' | 'RESPONSE_STATUS' | 'RULE' | 'SCRIPT_BASENAME' | 'SCRIPT_FILENAME' |
@@ -85,7 +85,7 @@ CollectionName:
     'RULE' | 'SESSION' | 'TX')
 ;
 
-SpecialCollection: 'XML' ':' XPathExpression;
+SpecialCollection: 'XML' ':'? XPathExpression?;
 
 XPathExpression: /(\/\*|\/\/@\*)/;
 
@@ -192,7 +192,7 @@ StringWithSpaces: /[A-Za-z0-9\-\/\ \._]+/;
 PathOrMacro: PathNameValue | MacroVar;
     
 // Filesystem Paths (could be merged with URI, tought)    
-PathNameValue: /[a-zA-Z0-9\-_\.\/]+/;
+PathNameValue: /[a-zA-Z0-9\-_\.\/;]+/;
 
 // Macros, e.g: %{tx.critical_anomaly_score}
 Macro:  INT | OperationMacro | ExtendedMacro | MacroVar;

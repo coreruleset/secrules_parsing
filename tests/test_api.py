@@ -19,13 +19,14 @@ def test_model_parse() -> None:
     """Test that we can parse the model correctly"""
     rule_text = """
     SecRule ARGS "@rx found" "id:1,log,noauditlog,t:lowercase,block"
+    SecRule FILES:pluginzip "@endsWith .zip" "id:2,phase:2,pass,t:none,ctl:ruleRemoveTargetById=944110;REQUEST_BODY,ctl:ruleRemoveTargetById=944250;REQUEST_BODY"
     """
     parsed_rule = parser.process_from_str(rule_text)
     # print(ppretty(parsed_rule, depth=10))
     for rule in parsed_rule.rules:
         assert (rule.__class__.__name__) == "SecRule"
         for var in rule.variables:
-            assert var.collection == "ARGS"
+            assert var.collection in ["ARGS", "FILES"]
 
 
 def test_operator_contains_works_with_greater_than() -> None:

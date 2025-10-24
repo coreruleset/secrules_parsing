@@ -9,9 +9,9 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        crsversion: ['3.3.5', '3.2.1']
+        crsversion: ['4.19.0', '3.3.5', '3.2.1']
         poetry-version: ['1.7.0']
-        python-version: ['3.8', '3.9', '3.10']
+        python-version: ['3.9', '3.10']
 
     steps:
       - name: "Checkout repo"

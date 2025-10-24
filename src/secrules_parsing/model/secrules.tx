@@ -78,7 +78,7 @@ CollectionArgument: AnythingBetweenSingleQuotes | '/' SlashedRegExp '/' | Variab
 /* Collections */
 CollectionName:
     ('ARGS_GET' | 'ARGS_GET_NAMES' | 'ARGS_POST' | 'ARGS_POST_NAMES' | 'ARGS_NAMES' | 'ARGS' | 'ENV' |
-    'FILES' | 'FILES_NAMES' | 'FILES_TMPNAMES' | 'GEO' | 'GLOBAL' | 'IP' | 'MATCHED_VARS_NAMES' |
+    'FILES_NAMES' | 'FILES_TMPNAMES' | 'FILES' | 'GEO' | 'GLOBAL' | 'IP' | 'MATCHED_VARS_NAMES' |
     'MATCHED_VARS' | 'MULTIPART_PART_HEADERS' | 'PERF_RULES' | 'REQUEST_COOKIES_NAMES' | 'REQUEST_COOKIES' |
     'REQUEST_HEADERS_NAMES' | 'REQUEST_HEADERS' | 'RESPONSE_HEADERS_NAMES' | 'RESPONSE_HEADERS' |
     'RULE' | 'SESSION' | 'TX')

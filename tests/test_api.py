@@ -82,7 +82,8 @@ def test_collection_argument_with_dollar() -> None:
             if action.ctl:
                 matched = True
                 assert action.ctl.ruleRemoveTargetById == 942290
-                assert action.ctl.removeVariableName == "json.flags.$notjunk"
+                assert action.ctl.removeVariable.collection == "ARGS_NAMES"
+                assert action.ctl.removeVariable.collectionArg == "json.flags.$notjunk"
 
     assert matched
 
@@ -115,3 +116,17 @@ def test_lowercase_and_uppercase_in_argument() -> None:
                                           "never match")
 
     assert matched
+
+def test_use_collection_keys() -> None:
+    """Test if the collection keys work as we expected"""
+    rule_text = """
+    SecRule ARGS_NAMES|!ARGS_NAMES:/^foo$/|!ARGS_NAMES:/^bar*?$/|ARGS "@rx found" "id:1,log,noauditlog,t:lowercase,block"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    # print(ppretty(parsed_rule, depth=10))
+    for rule in parsed_rule.rules:
+        assert (rule.__class__.__name__) == "SecRule"
+        for var in rule.variables:
+            assert var.collection in ["ARGS_NAMES", "ARGS"]
+            if var.collection == "ARGS_NAMES":
+                assert var.collectionArg in [None, "/^foo$/", "/^bar*?$/"]

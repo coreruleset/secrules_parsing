@@ -149,7 +149,7 @@ TransientAction:
     'hashEngine=' | 'hashEnforcement=';
 
 Transformation:
-    'base64Decode'|'sqlHexDecode'|'base64DecodeExt'|'base64Encode'|'cmdLine'|'compressWhitespace'|'cssDecode'|
+    'base64DecodeExt'|'sqlHexDecode'|'base64Decode'|'base64Encode'|'cmdLine'|'compressWhitespace'|'cssDecode'|
     'escapeSeqDecode'|'hexDecode'|'hexEncode'|'htmlEntityDecode'|'jsDecode'|'length'|'lowercase'|'md5'|'none'|
     'normalisePathWin'|'normalizePathWin'|'normalisePath'|'normalizePath'|'parityEven7bit'|'parityOdd7bit'|
     'parityZero7bit'|'removeNulls'|'removeWhitespace'|'replaceComments'|'removeCommentsChar'|'removeComments'|

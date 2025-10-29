@@ -128,7 +128,7 @@ Action:
     "rev:" "'"? rev=INT "'"? | 'sanitiseArg:' sanitizearg=ParameterName | sanitizematched ?= 'sanitiseMatched' |
     'sanitiseMatchedBytes:' sanitizematchedbytes=INT | 'sanitiseRequestHeader:' sanitizerequestheader=STRING |
     'sanitiseResponseHeader:' sanitizeresponseheader=STRING | 'severity:' severity=Severity |
-    'setuid:' setuid=STRING | 'setrsc:' setrsc=STRING | 'setsid:' setsid=STRING | 'setenv:' setenv=STRING |
+    'setuid:' setuid=STRING | 'setrsc:' setrsc=STRING | 'setsid:' setsid=STRING | 'setenv:' "'"? '!'? varname=VariableName '='? macro=Macro? "'"? |
     'setvar:' "'"? '!'? varname=VariableName '='? macro=Macro? "'"? | 'skip:' skip=INT |
     'skipAfter:' skipafter=SkipTag | 'status:' status=INT | 't:' transformations*=Transformation[','] |
     "tag:'" tag=Tag "'" | "ver:'" ver=Tag "'" | 'xmlns:' xmlns=STRING;

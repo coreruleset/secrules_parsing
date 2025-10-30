@@ -248,7 +248,7 @@ AuditEngineValue: OnOffValue | 'RelevantOnly';
 RuleEngineValue: OnOffValue | 'DetectionOnly';
 
 // Can this be used multiple times, e.g.: +AC?
-AuditLogPartsValue: /(\+|-)[A-Z]/;
+AuditLogPartsValue: /(\+|-)[A-Z]+/;
 
 RequestBodyProcessorValue: 'text/xml' | 'text/json' | 'URLENCODED' | 'JSON' | 'MULTIPART' | 'XML';
 

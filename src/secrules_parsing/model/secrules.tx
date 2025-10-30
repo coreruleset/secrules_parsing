@@ -179,7 +179,7 @@ ByteRangeList: byterange*=RangeINT[','];
 RangeINT: INT '-' INT | INT;
     
 // Should match ips
-IPCIDR: /[0-9a-f\.\:]+/;
+IPCIDR: /[0-9a-f\.\:]+(?:\/(?:[1-5][0-9]|6[0-4]|[1-9]))?/;
 
 // Single Quote delimited STRING
 SQDelimitedSTRING: "'" msg=MessageValue? ':'? macro=MacroVar? "'";

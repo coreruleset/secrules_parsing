@@ -194,13 +194,13 @@ PathOrMacro: PathNameValue | MacroVar;
 PathNameValue: /[a-zA-Z0-9\-_\.\/;]+/;
 
 // Macros, e.g: %{tx.critical_anomaly_score}
-Macro:  INT | OperationMacro | ExtendedMacro | MacroVar;
+Macro:  OperationMacro | ExtendedMacro | MacroVar | ExtendedMacroWithComma | INT;
 
 // This extended macro are a little bag of holding...
 ExtendedMacro: /[A-Za-z0-9S\-\_\.\:\ \/\%\{\}\|\+=#?]+/;
 
 // macro with comma, quoted by '
-ExtendedMacroWithComma: /[A-Za-z0-9S\-\_\.\:\ \/\%\{\}\|\+=#?,]+/;
+ExtendedMacroWithComma: /[A-Za-z0-9S\-\_\.\:\ \/\%\{\}\|\+=#?,\<\>]+/;
 
 OperationMacro: ('+' | '-') var=MacroVar;
 

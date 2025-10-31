@@ -130,3 +130,59 @@ def test_use_collection_keys() -> None:
             assert var.collection in ["ARGS_NAMES", "ARGS"]
             if var.collection == "ARGS_NAMES":
                 assert var.collectionArg in [None, "/^foo$/", "/^bar*?$/"]
+
+def test_use_commas_in_setvar() -> None:
+    """
+        Test if the value of the 'setvar' action arguments contains ',' (comma),
+        '<' (less than) or '>' (greater than) character
+    """
+    rule_text = """
+    SecRule TX:FALSE-POSITIVE-REPORT-PLUGIN_FILTER_IP "@gt 0" \
+        "id:9525140,\
+        phase:5,\
+        pass,\
+        t:none,t:length,\
+        nolog,\
+        setvar:'tx.false-positive-report-plugin_remote_addr=,%{remote_addr},',\
+        setvar:'tx.false-positive-report-plugin_smtp_subject=<server_hostname> - <host_header>: False positive report from CRS'"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    # print(ppretty(parsed_rule, depth=10))
+    matches = 0
+    for rule in parsed_rule.rules:
+        assert (rule.__class__.__name__) == "SecRule"
+        for act in rule.actions:
+            if act.varname == "tx.false-positive-report-plugin_remote_addr" and \
+               act.macro   == ",%{remote_addr},":
+                   matches += 1
+            if act.varname == "tx.false-positive-report-plugin_smtp_subject" and \
+               act.macro   == "<server_hostname> - <host_header>: False positive report from CRS":
+                   matches += 1
+        assert(matches == 2)
+
+def test_use_multi_ids_in_setvar_arg() -> None:
+    """
+        Test if the value of the 'setvar' action arguments contains multiple
+        numbers (rule ID's)
+    """
+    rule_text = """
+        SecAction \
+          "id:9525020,\
+          phase:5,\
+          nolog,\
+          pass,\
+          t:none,\
+          ver:'false-positive-report-plugin/1.0.0',\
+          setvar:'tx.false-positive-report-plugin_filter_ignore_id=949110 959100 980130 980140'"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    # print(ppretty(parsed_rule, depth=10))
+    matches = 0
+    for rule in parsed_rule.rules:
+        assert (rule.__class__.__name__) == "SecAction"
+        for act in rule.actions:
+            if act.varname == "tx.false-positive-report-plugin_filter_ignore_id" and \
+               act.macro   == "949110 959100 980130 980140":
+                   matches += 1
+        assert(matches == 1)
+

@@ -215,6 +215,8 @@ def test_check_collection_keys_in_target_exclusion() -> None:
           nolog,\
           pass,\
           t:none,\
+          ctl:ruleRemoveTargetById=921180;ARGS_NAMES,\
+          ctl:ruleRemoveTargetById=921180;ARGS_NAMES:folders.folders,\
           ctl:ruleRemoveTargetById=921180;TX:paramcounter_ARGS_NAMES:folders.folders,\
           ctl:ruleRemoveTargetByTag=OWASP;TX:paramcounter_ARGS_NAMES:folders.folders,\
           ctl:ruleRemoveTargetByMsg='multi target';TX:paramcounter_ARGS_NAMES:folders.folders"
@@ -231,14 +233,21 @@ def test_check_collection_keys_in_target_exclusion() -> None:
                     matches += 1
                 if action.ctl.message == "'multi target'":
                     matches += 1
+                if action.ctl.removeVariable.collection == "ARGS_NAMES":
+                    matches += 1
                 if action.ctl.removeVariable.collection == "TX":
+                    matches += 1
+                if action.ctl.removeVariable.collectionArg == "folders.folders":
                     matches += 1
                 if action.ctl.removeVariable.collectionArg == "paramcounter_ARGS_NAMES":
                     matches += 1
                 if action.ctl.removeVariableKey == "folders.folders":
                     matches += 1
-    # 3 exclusions, matches argument (ID, tag, msg) -> 3, collection (TX) -> 3,
-    # collection arg (paramcounter_ARGS_NAMES) -> 3, arg key (folders.folders) -> 3
-    # total 12
-    assert (matches == 12)
+    # 1st excl: ID, collection (ARGS_NAMES) -> 2
+    # 2nd excl: ID, collection (ARGS_NAMES), coll arg (folders.folders) -> 3
+    # 3rd excl: ID, collection (TX), coll arg (paramcounter_ARGS_NAMES), coll arg (folders.folders) -> 4
+    # 4th excl: tag, collection (TX), coll arg (paramcounter_ARGS_NAMES), coll arg (folders.folders) -> 4
+    # 5th excl: msg, collection (TX), coll arg (paramcounter_ARGS_NAMES), coll arg (folders.folders) -> 4
+    # total 17
+    assert (matches == 17)
 

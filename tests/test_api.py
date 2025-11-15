@@ -186,3 +186,59 @@ def test_use_multi_ids_in_setvar_arg() -> None:
                    matches += 1
         assert(matches == 1)
 
+def test_check_collection_keys() -> None:
+    """
+        Test if the rule looks for a specific key in collection
+    """
+    rule_text = """
+        SecRule ARGS:foobar "@rx attack" \
+          "id:1,\
+          phase:1,\
+          nolog,\
+          pass,\
+          t:none"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    matches = 0
+    for rule in parsed_rule.rules:
+        for v in rule.variables:
+            assert(v.collectionArg == "foobar")
+
+def test_check_collection_keys_in_target_exclusion() -> None:
+    """
+        Test if the rule looks for a specific key in collection
+    """
+    rule_text = """
+        SecRule REQUEST_URI "@beginsWith /admin" \
+          "id:1,\
+          phase:1,\
+          nolog,\
+          pass,\
+          t:none,\
+          ctl:ruleRemoveTargetById=921180;TX:paramcounter_ARGS_NAMES:folders.folders,\
+          ctl:ruleRemoveTargetByTag=OWASP;TX:paramcounter_ARGS_NAMES:folders.folders,\
+          ctl:ruleRemoveTargetByMsg='multi target';TX:paramcounter_ARGS_NAMES:folders.folders"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    matches = 0
+
+    for rule in parsed_rule.rules:
+        for action in rule.actions:
+            if action.ctl:
+                if action.ctl.ruleRemoveTargetById == 921180:
+                    matches += 1
+                if action.ctl.tagName == "OWASP":
+                    matches += 1
+                if action.ctl.message == "'multi target'":
+                    matches += 1
+                if action.ctl.removeVariable.collection == "TX":
+                    matches += 1
+                if action.ctl.removeVariable.collectionArg == "paramcounter_ARGS_NAMES":
+                    matches += 1
+                if action.ctl.removeVariableKey == "folders.folders":
+                    matches += 1
+    # 3 exclusions, matches argument (ID, tag, msg) -> 3, collection (TX) -> 3,
+    # collection arg (paramcounter_ARGS_NAMES) -> 3, arg key (folders.folders) -> 3
+    # total 12
+    assert (matches == 12)
+

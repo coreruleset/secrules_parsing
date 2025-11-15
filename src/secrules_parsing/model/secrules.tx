@@ -143,9 +143,9 @@ TransientAction:
     'responseBodyAccess=' responseBodyAccess=OnOffValue | 'responseBodyLimit=' responseBodyLimit=INT |
     'ruleEngine=' ruleEngine=RuleEngineValue | 'ruleRemoveById=' ruleRemoveById=RangeINT |
     'ruleRemoveByMsg=' ruleRemoveByMsg=MessageValue | 'ruleRemoveByTag=' ruleRemoveByTag=Tag |
-    'ruleRemoveTargetById=' ruleRemoveTargetById=RangeINT ';' removeVariable=Variable |
-    'ruleRemoveTargetByMsg=' message=MessageValue ';' removeVariable=Variable |
-    'ruleRemoveTargetByTag=' tagName=Tag ';' removeVariable=Variable |
+    'ruleRemoveTargetById=' ruleRemoveTargetById=RangeINT ';' removeVariable=Variable ':'? removeVariableKey=CollectionArgument? |
+    'ruleRemoveTargetByMsg=' message=MessageValue ';' removeVariable=Variable ':'? removeVariableKey=CollectionArgument?|
+    'ruleRemoveTargetByTag=' tagName=Tag ';' removeVariable=Variable ':'? removeVariableKey=CollectionArgument? |
     'hashEngine=' | 'hashEnforcement=';
 
 Transformation:

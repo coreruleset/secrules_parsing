@@ -40,6 +40,7 @@ def process_rules(files, verbose=False, debug=False):
                 "line": e.line,
                 "col": e.col,
                 "message": e.message,
+                "context": e.context,
             }
         models.append(model)
     return models
@@ -86,7 +87,7 @@ def get_correctness(files, output_type, models):
                 )
             else:
                 print(
-                    f"Syntax invalid: Syntax error in line {e['line']} col {e['col']}: {e['message']}"
+                    f"Syntax invalid: Syntax error in line {e['line']} col {e['col']}: {e['message']} - {e['context']}"
                 )
             exitcode = 1
         else:

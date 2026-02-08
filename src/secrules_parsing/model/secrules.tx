@@ -143,9 +143,9 @@ TransientAction:
     'responseBodyAccess=' responseBodyAccess=OnOffValue | 'responseBodyLimit=' responseBodyLimit=INT |
     'ruleEngine=' ruleEngine=RuleEngineValue | 'ruleRemoveById=' ruleRemoveById=RangeINT |
     'ruleRemoveByMsg=' ruleRemoveByMsg=MessageValue | 'ruleRemoveByTag=' ruleRemoveByTag=Tag |
-    'ruleRemoveTargetById=' ruleRemoveTargetById=RangeINT ';' removeVariable=Variable |
-    'ruleRemoveTargetByMsg=' message=MessageValue ';' removeVariable=Variable |
-    'ruleRemoveTargetByTag=' tagName=Tag ';' removeVariable=Variable |
+    'ruleRemoveTargetById=' ruleRemoveTargetById=RangeINT ';' removeVariable=Variable ':'? removeVariableKey=CollectionArgument? |
+    'ruleRemoveTargetByMsg=' message=MessageValue ';' removeVariable=Variable ':'? removeVariableKey=CollectionArgument?|
+    'ruleRemoveTargetByTag=' tagName=Tag ';' removeVariable=Variable ':'? removeVariableKey=CollectionArgument? |
     'hashEngine=' | 'hashEnforcement=';
 
 Transformation:
@@ -194,13 +194,13 @@ PathOrMacro: PathNameValue | MacroVar;
 PathNameValue: /[a-zA-Z0-9\-_\.\/;]+/;
 
 // Macros, e.g: %{tx.critical_anomaly_score}
-Macro:  INT | OperationMacro | ExtendedMacro | MacroVar;
+Macro:  OperationMacro | ExtendedMacro | MacroVar | ExtendedMacroWithComma | INT;
 
 // This extended macro are a little bag of holding...
 ExtendedMacro: /[A-Za-z0-9S\-\_\.\:\ \/\%\{\}\|\+=#?]+/;
 
 // macro with comma, quoted by '
-ExtendedMacroWithComma: /[A-Za-z0-9S\-\_\.\:\ \/\%\{\}\|\+=#?,]+/;
+ExtendedMacroWithComma: /[A-Za-z0-9S\-\_\.\:\ \/\%\{\}\|\+=#?,\<\>]+/;
 
 OperationMacro: ('+' | '-') var=MacroVar;
 

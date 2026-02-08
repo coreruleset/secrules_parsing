@@ -130,3 +130,124 @@ def test_use_collection_keys() -> None:
             assert var.collection in ["ARGS_NAMES", "ARGS"]
             if var.collection == "ARGS_NAMES":
                 assert var.collectionArg in [None, "/^foo$/", "/^bar*?$/"]
+
+def test_use_commas_in_setvar() -> None:
+    """
+        Test if the value of the 'setvar' action arguments contains ',' (comma),
+        '<' (less than) or '>' (greater than) character
+    """
+    rule_text = """
+    SecRule TX:FALSE-POSITIVE-REPORT-PLUGIN_FILTER_IP "@gt 0" \
+        "id:9525140,\
+        phase:5,\
+        pass,\
+        t:none,t:length,\
+        nolog,\
+        setvar:'tx.false-positive-report-plugin_remote_addr=,%{remote_addr},',\
+        setvar:'tx.false-positive-report-plugin_smtp_subject=<server_hostname> - <host_header>: False positive report from CRS'"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    # print(ppretty(parsed_rule, depth=10))
+    matches = 0
+    for rule in parsed_rule.rules:
+        assert (rule.__class__.__name__) == "SecRule"
+        for act in rule.actions:
+            if act.varname == "tx.false-positive-report-plugin_remote_addr" and \
+               act.macro   == ",%{remote_addr},":
+                   matches += 1
+            if act.varname == "tx.false-positive-report-plugin_smtp_subject" and \
+               act.macro   == "<server_hostname> - <host_header>: False positive report from CRS":
+                   matches += 1
+        assert(matches == 2)
+
+def test_use_multi_ids_in_setvar_arg() -> None:
+    """
+        Test if the value of the 'setvar' action arguments contains multiple
+        numbers (rule ID's)
+    """
+    rule_text = """
+        SecAction \
+          "id:9525020,\
+          phase:5,\
+          nolog,\
+          pass,\
+          t:none,\
+          ver:'false-positive-report-plugin/1.0.0',\
+          setvar:'tx.false-positive-report-plugin_filter_ignore_id=949110 959100 980130 980140'"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    # print(ppretty(parsed_rule, depth=10))
+    matches = 0
+    for rule in parsed_rule.rules:
+        assert (rule.__class__.__name__) == "SecAction"
+        for act in rule.actions:
+            if act.varname == "tx.false-positive-report-plugin_filter_ignore_id" and \
+               act.macro   == "949110 959100 980130 980140":
+                   matches += 1
+        assert(matches == 1)
+
+def test_check_collection_keys() -> None:
+    """
+        Test if the rule looks for a specific key in collection
+    """
+    rule_text = """
+        SecRule ARGS:foobar "@rx attack" \
+          "id:1,\
+          phase:1,\
+          nolog,\
+          pass,\
+          t:none"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    matches = 0
+    for rule in parsed_rule.rules:
+        for v in rule.variables:
+            assert(v.collectionArg == "foobar")
+
+def test_check_collection_keys_in_target_exclusion() -> None:
+    """
+        Test if the rule looks for a specific key in collection
+    """
+    rule_text = """
+        SecRule REQUEST_URI "@beginsWith /admin" \
+          "id:1,\
+          phase:1,\
+          nolog,\
+          pass,\
+          t:none,\
+          ctl:ruleRemoveTargetById=921180;ARGS_NAMES,\
+          ctl:ruleRemoveTargetById=921180;ARGS_NAMES:folders.folders,\
+          ctl:ruleRemoveTargetById=921180;TX:paramcounter_ARGS_NAMES:folders.folders,\
+          ctl:ruleRemoveTargetByTag=OWASP;TX:paramcounter_ARGS_NAMES:folders.folders,\
+          ctl:ruleRemoveTargetByMsg='multi target';TX:paramcounter_ARGS_NAMES:folders.folders"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    matches = 0
+
+    for rule in parsed_rule.rules:
+        for action in rule.actions:
+            if action.ctl:
+                if action.ctl.ruleRemoveTargetById == 921180:
+                    matches += 1
+                if action.ctl.tagName == "OWASP":
+                    matches += 1
+                if action.ctl.message == "'multi target'":
+                    matches += 1
+                if action.ctl.removeVariable.collection == "ARGS_NAMES":
+                    matches += 1
+                if action.ctl.removeVariable.collection == "TX":
+                    matches += 1
+                if action.ctl.removeVariable.collectionArg == "folders.folders":
+                    matches += 1
+                if action.ctl.removeVariable.collectionArg == "paramcounter_ARGS_NAMES":
+                    matches += 1
+                if action.ctl.removeVariableKey == "folders.folders":
+                    matches += 1
+    # 1st excl: ID, collection (ARGS_NAMES) -> 2
+    # 2nd excl: ID, collection (ARGS_NAMES), coll arg (folders.folders) -> 3
+    # 3rd excl: ID, collection (TX), coll arg (paramcounter_ARGS_NAMES), coll arg (folders.folders) -> 4
+    # 4th excl: tag, collection (TX), coll arg (paramcounter_ARGS_NAMES), coll arg (folders.folders) -> 4
+    # 5th excl: msg, collection (TX), coll arg (paramcounter_ARGS_NAMES), coll arg (folders.folders) -> 4
+    # total 17
+    assert (matches == 17)
+

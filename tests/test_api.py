@@ -251,3 +251,160 @@ def test_check_collection_keys_in_target_exclusion() -> None:
     # total 17
     assert (matches == 17)
 
+
+def test_setenv_unquoted_syntax() -> None:
+    """
+        Test that setenv action works with unquoted syntax (issue #92)
+        This test verifies the fix in PR #93
+    """
+    rule_text = """
+    SecRule ARGS "@rx ^.{3,}$" \
+        "id:1,\
+        phase:2,\
+        pass,\
+        setenv:my_env=my_env_value"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    matches = 0
+    for rule in parsed_rule.rules:
+        assert rule.__class__.__name__ == "SecRule"
+        for act in rule.actions:
+            if act.varname == "my_env" and act.macro == "my_env_value":
+                matches += 1
+    assert matches == 1
+
+
+def test_setenv_quoted_syntax() -> None:
+    """
+        Test that setenv action works with quoted syntax (issue #92)
+        This test verifies the fix in PR #93
+    """
+    rule_text = """
+    SecRule ARGS "@rx ^.{3,}$" \
+        "id:2,\
+        phase:2,\
+        pass,\
+        setenv:'my_env=my_env_value'"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    matches = 0
+    for rule in parsed_rule.rules:
+        assert rule.__class__.__name__ == "SecRule"
+        for act in rule.actions:
+            if act.varname == "my_env" and act.macro == "my_env_value":
+                matches += 1
+    assert matches == 1
+
+
+def test_setenv_with_macro() -> None:
+    """
+        Test that setenv action works with macro values
+        This test verifies the fix in PR #93
+    """
+    rule_text = """
+    SecRule ARGS "@rx attack" \
+        "id:3,\
+        phase:2,\
+        pass,\
+        setenv:'detected_attack=%{tx.anomaly_score}'"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    matches = 0
+    for rule in parsed_rule.rules:
+        assert rule.__class__.__name__ == "SecRule"
+        for act in rule.actions:
+            if act.varname == "detected_attack" and act.macro == "%{tx.anomaly_score}":
+                matches += 1
+    assert matches == 1
+
+
+def test_setenv_deletion_quoted() -> None:
+    """
+        Test that setenv action works with deletion syntax (quoted)
+        This test verifies the fix in PR #93
+    """
+    rule_text = """
+    SecRule REQUEST_URI "@beginsWith /safe" \
+        "id:4,\
+        phase:1,\
+        pass,\
+        setenv:'!suspicious_request'"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    matches = 0
+    for rule in parsed_rule.rules:
+        assert rule.__class__.__name__ == "SecRule"
+        for act in rule.actions:
+            if act.varname == "suspicious_request" and not act.macro:
+                matches += 1
+    assert matches == 1
+
+
+def test_setenv_deletion_unquoted() -> None:
+    """
+        Test that setenv action works with deletion syntax (unquoted)
+        This test verifies the fix in PR #93
+    """
+    rule_text = """
+    SecRule REQUEST_URI "@beginsWith /safe" \
+        "id:5,\
+        phase:1,\
+        pass,\
+        setenv:!suspicious_request"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    matches = 0
+    for rule in parsed_rule.rules:
+        assert rule.__class__.__name__ == "SecRule"
+        for act in rule.actions:
+            if act.varname == "suspicious_request" and not act.macro:
+                matches += 1
+    assert matches == 1
+
+
+def test_setenv_with_special_characters() -> None:
+    """
+        Test that setenv action works with special characters in values
+        This test verifies the fix in PR #93
+    """
+    rule_text = """
+    SecRule ARGS "@rx attack" \
+        "id:6,\
+        phase:2,\
+        pass,\
+        setenv:'log_message=Attack detected: %{MATCHED_VAR}',\
+        setenv:log_level=warning"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    matches = 0
+    for rule in parsed_rule.rules:
+        assert rule.__class__.__name__ == "SecRule"
+        for act in rule.actions:
+            if act.varname == "log_message" and act.macro == "Attack detected: %{MATCHED_VAR}":
+                matches += 1
+            if act.varname == "log_level" and act.macro == "warning":
+                matches += 1
+    assert matches == 2
+
+
+def test_setenv_without_value() -> None:
+    """
+        Test that setenv action works with just a variable name (no value)
+        This test verifies the fix in PR #93
+    """
+    rule_text = """
+    SecRule REQUEST_METHOD "@streq POST" \
+        "id:7,\
+        phase:1,\
+        pass,\
+        setenv:'is_post='"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    matches = 0
+    for rule in parsed_rule.rules:
+        assert rule.__class__.__name__ == "SecRule"
+        for act in rule.actions:
+            if act.varname == "is_post" and (act.macro == "" or act.macro is None):
+                matches += 1
+    assert matches == 1
+

@@ -31,7 +31,7 @@ packages = [
 python = ">=3.9,<4.0"
 textX = ">=4.3,<4.4"
 importlib-metadata = ">=8.7.1,<8.8.0"
-setuptools = ">=65.0.0,<81.0.0"
+setuptools = ">=82.0.0,<82.1.0"
 
 [tool.poetry.scripts]
 secrules-parser = 'secrules_parsing.cli:run'
@@ -40,7 +40,7 @@ secrules-parser = 'secrules_parsing.cli:run'
 pytest = "8.4.2"
 ppretty = "1.3"
 toml = "0.10.2"
-setuptools = "==80.10.2"
+setuptools = "==82.0.0"
 
 [tool.semantic_release]
 version_variable = "pyproject.toml:version"

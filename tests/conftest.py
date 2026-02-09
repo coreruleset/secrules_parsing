@@ -68,8 +68,14 @@ def assert_parse_success(parsed_result: Union[Any, Dict]) -> None:
         assert_parse_success(result)
         # Now safe to use result.rules
     """
-    assert not isinstance(parsed_result, dict), \
-        f"Parse failed: {parsed_result.get('message', 'Unknown error')} at line {parsed_result.get('line', '?')}"
+    if isinstance(parsed_result, dict):
+        context = parsed_result.get('context', '')
+        context_str = f" - Context: {context}" if context else ""
+        raise AssertionError(
+            f"Parse failed: {parsed_result.get('message', 'Unknown error')} "
+            f"at line {parsed_result.get('line', '?')} "
+            f"col {parsed_result.get('col', '?')}{context_str}"
+        )
 
 
 def get_rules_by_type(parsed_result: Any, rule_type: str) -> List[Any]:

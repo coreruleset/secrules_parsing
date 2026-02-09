@@ -123,6 +123,8 @@ def test_example_parse_error_handling():
     if isinstance(result, dict):
         assert 'message' in result
         assert 'line' in result
+        assert 'col' in result
+        assert 'context' in result  # NEW: context field added in recent update
         # Test passes - we expected a parse error
         return
 

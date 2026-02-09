@@ -29,7 +29,7 @@ packages = [
 # Requirements
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"
-textX = ">=2.3,<4.0"
+textX = ">=4.3,<4.4"
 importlib-metadata = ">=8.7.1,<8.8.0"
 setuptools = ">=65.0.0,<81.0.0"
 

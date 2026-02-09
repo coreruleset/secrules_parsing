@@ -185,23 +185,22 @@ type = ["importlib_metadata (>=7.0.2) ; python_version < \"3.10\"", "jaraco.deve
 
 [[package]]
 name = "textx"
-version = "3.1.1"
+version = "4.3.0"
 description = "Meta-language for DSL implementation inspired by Xtext"
 optional = false
-python-versions = "*"
+python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "textX-3.1.1-py2.py3-none-any.whl", hash = "sha256:1f2bd936309f5f9092567e3f5a0c513d8292d5852c63a72096fe5a57018d0f50"},
-    {file = "textX-3.1.1.tar.gz", hash = "sha256:e2fb7d090ea4a71f8bf2f0303770275c42a5f73854b4e7f6adfcdbe368fab0fa"},
+    {file = "textx-4.3.0-py3-none-any.whl", hash = "sha256:261535f7e2de1529604026d58bf7dae9e40788644def4d033ca781680fa5dae7"},
+    {file = "textx-4.3.0.tar.gz", hash = "sha256:0facac8029ad124ef21e5838dd8eb67f10129efcee96ea3548f5fd62428a9880"},
 ]
 
 [package.dependencies]
 Arpeggio = ">=2.0.0"
+importlib-metadata = {version = "*", markers = "python_version < \"3.10\""}
 
 [package.extras]
-cli = ["click (>=7.0,<8.0)"]
-dev = ["click (>=7.0,<8.0)", "mike", "mkdocs", "setuptools-scm", "textX-dev", "twine"]
-test = ["click (>=7.0,<8.0)", "coverage", "coveralls", "flake8", "html5lib", "jinja2", "pytest", "tox"]
+cli = ["click (>=7.0,<9.0)"]
 
 [[package]]
 name = "toml"
@@ -309,4 +308,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9,<4.0"
-content-hash = "6b9d8b172b6ee5781b8385903a2929624cc04602303c3e202d86f4b8aaae47d8"
+content-hash = "147ce38b810e1471ec16bd3bce6040929c6bf99bb65aa2efae3fb771cca12f68"

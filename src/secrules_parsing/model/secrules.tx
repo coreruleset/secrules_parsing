@@ -30,7 +30,7 @@ SecRuleRemoveById:
     'SecRuleRemoveById' ids=IDRangeList;
 
 SecRuleRemoveByTag:
-    'SecRuleRemoveBytag' tag=Tag;
+    'SecRuleRemoveByTag' tag=Tag;
 
 SecRuleUpdateTargetById:
     'SecRuleUpdateTargetById' id=INT targets+=TARGET[',']?;

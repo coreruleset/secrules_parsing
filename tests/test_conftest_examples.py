@@ -19,7 +19,6 @@ from tests.conftest import (
     assert_parse_success,
     get_rules_by_type,
     find_action_by_attribute,
-    count_actions_by_attribute,
     has_transformation,
 )
 

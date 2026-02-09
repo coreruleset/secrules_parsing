@@ -11,8 +11,9 @@ NOTE: Some tests document grammar bugs/limitations compared to official ModSecur
 - deprecatevar: Grammar expects ID, docs show complex syntax (var=time/lifetime)
 - setuid/setsid/setrsc: Grammar expects STRING, may cause quoting issues
 
-Reference: https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual-(v2.x)-Actions
+Reference: https://github.com/owasp-modsecurity/ModSecurity/wiki/Reference-Manual-(v2.x)-Actions
 """
+import pytest
 from secrules_parsing import parser
 
 
@@ -591,6 +592,7 @@ def test_action_sanitise_matched() -> None:
     assert matches == 1
 
 
+@pytest.mark.xfail(reason="Grammar limitation: sanitiseMatchedBytes only accepts INT, docs show ranges (1/4) or standalone")
 def test_action_sanitise_matched_bytes() -> None:
     """
     Test sanitiseMatchedBytes action
@@ -601,16 +603,16 @@ def test_action_sanitise_matched_bytes() -> None:
     SecRule ARGS "@rx secret" "id:1,sanitiseMatchedBytes:10,deny"
     """
     parsed_rule = parser.process_from_str(rule_text)
-    if isinstance(parsed_rule, dict):
-        # Grammar doesn't support this correctly, skip
-        assert True, "Grammar limitation - sanitiseMatchedBytes needs fixing"
-    else:
-        matches = 0
-        for rule in parsed_rule.rules:
-            for action in rule.actions:
-                if hasattr(action, 'sanitizematchedbytes') and action.sanitizematchedbytes == 10:
-                    matches += 1
-        assert matches == 1
+    # Assert parse success - will fail if grammar doesn't support this
+    assert not isinstance(parsed_rule, dict), \
+        f"Parse failed: {parsed_rule.get('message', 'Unknown error')}"
+
+    matches = 0
+    for rule in parsed_rule.rules:
+        for action in rule.actions:
+            if hasattr(action, 'sanitizematchedbytes') and action.sanitizematchedbytes == 10:
+                matches += 1
+    assert matches == 1
 
 
 def test_action_sanitise_arg() -> None:
@@ -627,6 +629,7 @@ def test_action_sanitise_arg() -> None:
     assert matches == 1
 
 
+@pytest.mark.xfail(reason="Grammar bug: sanitiseRequestHeader expects STRING but docs show unquoted")
 def test_action_sanitise_request_header() -> None:
     """
     Test sanitiseRequestHeader action
@@ -637,18 +640,19 @@ def test_action_sanitise_request_header() -> None:
     SecRule ARGS "@rx attack" "id:1,sanitiseRequestHeader:\\\"Authorization\\\",deny"
     """
     parsed_rule = parser.process_from_str(rule_text)
-    if isinstance(parsed_rule, dict):
-        # Grammar bug - mark as known issue
-        assert True, "Grammar issue with sanitiseRequestHeader - needs STRING quoting fix"
-    else:
-        matches = 0
-        for rule in parsed_rule.rules:
-            for action in rule.actions:
-                if hasattr(action, 'sanitizerequestheader'):
-                    matches += 1
-        assert matches == 1
+    # Assert parse success - will fail due to grammar bug
+    assert not isinstance(parsed_rule, dict), \
+        f"Parse failed: {parsed_rule.get('message', 'Unknown error')}"
+
+    matches = 0
+    for rule in parsed_rule.rules:
+        for action in rule.actions:
+            if hasattr(action, 'sanitizerequestheader'):
+                matches += 1
+    assert matches == 1
 
 
+@pytest.mark.xfail(reason="Grammar bug: sanitiseResponseHeader expects STRING but docs show unquoted")
 def test_action_sanitise_response_header() -> None:
     """
     Test sanitiseResponseHeader action
@@ -659,16 +663,16 @@ def test_action_sanitise_response_header() -> None:
     SecRule ARGS "@rx attack" "id:1,sanitiseResponseHeader:\\\"Set-Cookie\\\",deny"
     """
     parsed_rule = parser.process_from_str(rule_text)
-    if isinstance(parsed_rule, dict):
-        # Grammar bug - mark as known issue
-        assert True, "Grammar issue with sanitiseResponseHeader - needs STRING quoting fix"
-    else:
-        matches = 0
-        for rule in parsed_rule.rules:
-            for action in rule.actions:
-                if hasattr(action, 'sanitizeresponseheader'):
-                    matches += 1
-        assert matches == 1
+    # Assert parse success - will fail due to grammar bug
+    assert not isinstance(parsed_rule, dict), \
+        f"Parse failed: {parsed_rule.get('message', 'Unknown error')}"
+
+    matches = 0
+    for rule in parsed_rule.rules:
+        for action in rule.actions:
+            if hasattr(action, 'sanitizeresponseheader'):
+                matches += 1
+    assert matches == 1
 
 
 # Response Actions
@@ -688,6 +692,7 @@ def test_action_status() -> None:
     assert matches == 1
 
 
+@pytest.mark.xfail(reason="Grammar bug: redirect action parsing issue with escaped quotes")
 def test_action_redirect() -> None:
     """
     Test redirect action
@@ -697,17 +702,19 @@ def test_action_redirect() -> None:
     SecRule ARGS "@rx attack" "id:1,redirect:\\\"https://example.com/blocked\\\",deny"
     """
     parsed_rule = parser.process_from_str(rule_text)
-    if isinstance(parsed_rule, dict):
-        assert True, "Grammar may need STRING quoting adjustment for redirect"
-    else:
-        matches = 0
-        for rule in parsed_rule.rules:
-            for action in rule.actions:
-                if hasattr(action, 'redirect'):
-                    matches += 1
-        assert matches == 1
+    # Assert parse success - will fail due to grammar bug
+    assert not isinstance(parsed_rule, dict), \
+        f"Parse failed: {parsed_rule.get('message', 'Unknown error')}"
+
+    matches = 0
+    for rule in parsed_rule.rules:
+        for action in rule.actions:
+            if hasattr(action, 'redirect'):
+                matches += 1
+    assert matches == 1
 
 
+@pytest.mark.xfail(reason="Grammar bug: proxy action parsing issue with escaped quotes")
 def test_action_proxy() -> None:
     """
     Test proxy action
@@ -717,20 +724,22 @@ def test_action_proxy() -> None:
     SecRule ARGS "@rx safe" "id:1,proxy:\\\"http://backend.example.com\\\",pass"
     """
     parsed_rule = parser.process_from_str(rule_text)
-    if isinstance(parsed_rule, dict):
-        assert True, "Grammar may need STRING quoting adjustment for proxy"
-    else:
-        matches = 0
-        for rule in parsed_rule.rules:
-            for action in rule.actions:
-                if hasattr(action, 'proxy'):
-                    matches += 1
-        assert matches == 1
+    # Assert parse success - will fail due to grammar bug
+    assert not isinstance(parsed_rule, dict), \
+        f"Parse failed: {parsed_rule.get('message', 'Unknown error')}"
+
+    matches = 0
+    for rule in parsed_rule.rules:
+        for action in rule.actions:
+            if hasattr(action, 'proxy'):
+                matches += 1
+    assert matches == 1
 
 
 # Execution Actions
 
 
+@pytest.mark.xfail(reason="Grammar bug: exec expects STRING (quoted), docs show unquoted paths")
 def test_action_exec() -> None:
     """
     Test exec action
@@ -741,15 +750,16 @@ def test_action_exec() -> None:
     SecRule ARGS "@rx attack" "id:1,exec:\\\"/usr/local/bin/alert.sh\\\",deny"
     """
     parsed_rule = parser.process_from_str(rule_text)
-    if isinstance(parsed_rule, dict):
-        assert True, "Grammar bug - exec expects STRING but should accept unquoted paths per ModSecurity docs"
-    else:
-        matches = 0
-        for rule in parsed_rule.rules:
-            for action in rule.actions:
-                if hasattr(action, 'exec'):
-                    matches += 1
-        assert matches == 1
+    # Assert parse success - will fail due to grammar bug
+    assert not isinstance(parsed_rule, dict), \
+        f"Parse failed: {parsed_rule.get('message', 'Unknown error')}"
+
+    matches = 0
+    for rule in parsed_rule.rules:
+        for action in rule.actions:
+            if hasattr(action, 'exec'):
+                matches += 1
+    assert matches == 1
 
 
 # Special Actions
@@ -797,6 +807,7 @@ def test_action_append() -> None:
     assert matches == 1
 
 
+@pytest.mark.xfail(reason="Grammar bug: prepend action parsing issue with escaped quotes")
 def test_action_prepend() -> None:
     """
     Test prepend action
@@ -807,17 +818,19 @@ def test_action_prepend() -> None:
     SecRule ARGS "@rx attack" "id:1,prepend:\\\"<!-- Blocked -->\\\",deny"
     """
     parsed_rule = parser.process_from_str(rule_text)
-    if isinstance(parsed_rule, dict):
-        assert True, "Grammar may need adjustment for prepend STRING handling"
-    else:
-        matches = 0
-        for rule in parsed_rule.rules:
-            for action in rule.actions:
-                if hasattr(action, 'prepend'):
-                    matches += 1
-        assert matches == 1
+    # Assert parse success - will fail due to grammar bug
+    assert not isinstance(parsed_rule, dict), \
+        f"Parse failed: {parsed_rule.get('message', 'Unknown error')}"
+
+    matches = 0
+    for rule in parsed_rule.rules:
+        for action in rule.actions:
+            if hasattr(action, 'prepend'):
+                matches += 1
+    assert matches == 1
 
 
+@pytest.mark.xfail(reason="Grammar bug: setuid action parsing issue with escaped quotes")
 def test_action_setuid() -> None:
     """
     Test setuid action
@@ -828,17 +841,19 @@ def test_action_setuid() -> None:
     SecRule ARGS "@rx attack" "id:1,setuid:\\\"user123\\\",deny"
     """
     parsed_rule = parser.process_from_str(rule_text)
-    if isinstance(parsed_rule, dict):
-        assert True, "Grammar may need STRING quoting adjustment for setuid"
-    else:
-        matches = 0
-        for rule in parsed_rule.rules:
-            for action in rule.actions:
-                if hasattr(action, 'setuid'):
-                    matches += 1
-        assert matches == 1
+    # Assert parse success - will fail due to grammar bug
+    assert not isinstance(parsed_rule, dict), \
+        f"Parse failed: {parsed_rule.get('message', 'Unknown error')}"
+
+    matches = 0
+    for rule in parsed_rule.rules:
+        for action in rule.actions:
+            if hasattr(action, 'setuid'):
+                matches += 1
+    assert matches == 1
 
 
+@pytest.mark.xfail(reason="Grammar bug: setsid action parsing issue with escaped quotes")
 def test_action_setsid() -> None:
     """
     Test setsid action
@@ -849,17 +864,19 @@ def test_action_setsid() -> None:
     SecRule ARGS "@rx attack" "id:1,setsid:\\\"session456\\\",deny"
     """
     parsed_rule = parser.process_from_str(rule_text)
-    if isinstance(parsed_rule, dict):
-        assert True, "Grammar may need STRING quoting adjustment for setsid"
-    else:
-        matches = 0
-        for rule in parsed_rule.rules:
-            for action in rule.actions:
-                if hasattr(action, 'setsid'):
-                    matches += 1
-        assert matches == 1
+    # Assert parse success - will fail due to grammar bug
+    assert not isinstance(parsed_rule, dict), \
+        f"Parse failed: {parsed_rule.get('message', 'Unknown error')}"
+
+    matches = 0
+    for rule in parsed_rule.rules:
+        for action in rule.actions:
+            if hasattr(action, 'setsid'):
+                matches += 1
+    assert matches == 1
 
 
+@pytest.mark.xfail(reason="Grammar bug: setrsc action parsing issue with escaped quotes")
 def test_action_setrsc() -> None:
     """
     Test setrsc action
@@ -869,17 +886,19 @@ def test_action_setrsc() -> None:
     SecRule ARGS "@rx attack" "id:1,setrsc:\\\"resource789\\\",deny"
     """
     parsed_rule = parser.process_from_str(rule_text)
-    if isinstance(parsed_rule, dict):
-        assert True, "Grammar may need STRING quoting adjustment for setrsc"
-    else:
-        matches = 0
-        for rule in parsed_rule.rules:
-            for action in rule.actions:
-                if hasattr(action, 'setrsc'):
-                    matches += 1
-        assert matches == 1
+    # Assert parse success - will fail due to grammar bug
+    assert not isinstance(parsed_rule, dict), \
+        f"Parse failed: {parsed_rule.get('message', 'Unknown error')}"
+
+    matches = 0
+    for rule in parsed_rule.rules:
+        for action in rule.actions:
+            if hasattr(action, 'setrsc'):
+                matches += 1
+    assert matches == 1
 
 
+@pytest.mark.xfail(reason="Grammar bug: xmlns action parsing issue with escaped quotes")
 def test_action_xmlns() -> None:
     """
     Test xmlns action
@@ -890,15 +909,16 @@ def test_action_xmlns() -> None:
     SecRule ARGS "@rx attack" "id:1,xmlns:\\\"http://example.com/ns\\\",deny"
     """
     parsed_rule = parser.process_from_str(rule_text)
-    if isinstance(parsed_rule, dict):
-        assert True, "Grammar may need adjustment for xmlns - should support namespace=URI syntax"
-    else:
-        matches = 0
-        for rule in parsed_rule.rules:
-            for action in rule.actions:
-                if hasattr(action, 'xmlns'):
-                    matches += 1
-        assert matches == 1
+    # Assert parse success - will fail due to grammar bug
+    assert not isinstance(parsed_rule, dict), \
+        f"Parse failed: {parsed_rule.get('message', 'Unknown error')}"
+
+    matches = 0
+    for rule in parsed_rule.rules:
+        for action in rule.actions:
+            if hasattr(action, 'xmlns'):
+                matches += 1
+    assert matches == 1
 
 
 # Transient (ctl:) Actions

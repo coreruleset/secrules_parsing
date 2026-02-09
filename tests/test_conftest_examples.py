@@ -5,18 +5,16 @@ Example tests demonstrating the use of conftest.py fixtures and helpers
 These examples show how the shared fixtures and helper functions from conftest.py
 can simplify test code and reduce duplication.
 
-Note: The helper functions from conftest.py are automatically available in the test
-namespace when using pytest. You can also import them explicitly using:
+Note: Fixtures defined in conftest.py are automatically available in the test
+namespace when using pytest. Plain helper functions must be imported explicitly,
+for example:
     from tests.conftest import parse_rule, assert_parse_success, etc.
 """
 import pytest
 
 # Import helper functions from conftest.py
-# These are automatically available via pytest's conftest mechanism
-import sys
-import os
-sys.path.insert(0, os.path.dirname(__file__))
-from conftest import (
+# Fixtures are auto-discovered by pytest; helper functions are imported explicitly
+from tests.conftest import (
     parse_rule,
     assert_parse_success,
     get_rules_by_type,

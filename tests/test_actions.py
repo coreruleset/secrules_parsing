@@ -1105,17 +1105,17 @@ def test_action_ctl_force_request_body_variable() -> None:
 def test_multiple_actions_combined() -> None:
     """Test rule with multiple different actions"""
     rule_text = """
-    SecRule ARGS "@rx attack" \
-        "id:999001,\
-        phase:2,\
-        deny,\
-        status:403,\
-        log,\
-        msg:'SQL Injection Attempt',\
-        severity:CRITICAL,\
-        tag:'attack-sqli',\
-        setvar:'tx.anomaly_score=+5',\
-        t:lowercase,\
+    SecRule ARGS "@rx attack" \\
+        "id:999001,\\
+        phase:2,\\
+        deny,\\
+        status:403,\\
+        log,\\
+        msg:'SQL Injection Attempt',\\
+        severity:CRITICAL,\\
+        tag:'attack-sqli',\\
+        setvar:'tx.anomaly_score=+5',\\
+        t:lowercase,\\
         t:urlDecode"
     """
     parsed_rule = parser.process_from_str(rule_text)

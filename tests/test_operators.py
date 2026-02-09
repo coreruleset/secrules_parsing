@@ -83,7 +83,7 @@ def test_operator_contains_word() -> None:
     for rule in parsed_rule.rules:
         assert rule.__class__.__name__ == "SecRule"
         # containsWord is parsed but STRING may be empty - just verify it exists
-        if hasattr(rule.operator, 'containsWord'):
+        if getattr(rule.operator, "containsWord", None) is not None:
             matches += 1
     assert matches == 1
 

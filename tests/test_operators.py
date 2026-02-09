@@ -328,11 +328,14 @@ def test_operator_ip_match() -> None:
         "id:1040,phase:1,deny"
     """
     parsed_rule = parser.process_from_str(rule_text)
-    if not isinstance(parsed_rule, dict):  # Check it's not a parse error
-        for rule in parsed_rule.rules:
-            assert rule.__class__.__name__ == "SecRule"
-            # Just verify ipmatch attribute exists
-            assert hasattr(rule.operator, 'ipmatch')
+    # Explicitly fail if parsing fails - don't silently pass
+    assert not isinstance(parsed_rule, dict), \
+        f"Parse failed: {parsed_rule.get('message', 'Unknown error')}"
+
+    for rule in parsed_rule.rules:
+        assert rule.__class__.__name__ == "SecRule"
+        # Just verify ipmatch attribute exists
+        assert hasattr(rule.operator, 'ipmatch')
 
 
 def test_operator_ip_match_multiple() -> None:
@@ -342,11 +345,14 @@ def test_operator_ip_match_multiple() -> None:
         "id:1041,phase:1,deny"
     """
     parsed_rule = parser.process_from_str(rule_text)
-    if not isinstance(parsed_rule, dict):  # Check it's not a parse error
-        for rule in parsed_rule.rules:
-            assert rule.__class__.__name__ == "SecRule"
-            if rule.operator.ipmatch:
-                assert len(rule.operator.ipmatch) > 0
+    # Explicitly fail if parsing fails - don't silently pass
+    assert not isinstance(parsed_rule, dict), \
+        f"Parse failed: {parsed_rule.get('message', 'Unknown error')}"
+
+    for rule in parsed_rule.rules:
+        assert rule.__class__.__name__ == "SecRule"
+        if rule.operator.ipmatch:
+            assert len(rule.operator.ipmatch) > 0
 
 
 def test_operator_ip_match_ipv6() -> None:
@@ -356,10 +362,13 @@ def test_operator_ip_match_ipv6() -> None:
         "id:1042,phase:1,deny"
     """
     parsed_rule = parser.process_from_str(rule_text)
-    if not isinstance(parsed_rule, dict):
-        for rule in parsed_rule.rules:
-            assert rule.__class__.__name__ == "SecRule"
-            assert hasattr(rule.operator, 'ipmatch')
+    # Explicitly fail if parsing fails - don't silently pass
+    assert not isinstance(parsed_rule, dict), \
+        f"Parse failed: {parsed_rule.get('message', 'Unknown error')}"
+
+    for rule in parsed_rule.rules:
+        assert rule.__class__.__name__ == "SecRule"
+        assert hasattr(rule.operator, 'ipmatch')
 
 
 def test_operator_ip_match_f() -> None:

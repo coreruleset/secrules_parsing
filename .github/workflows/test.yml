@@ -1,36 +1,31 @@
 ---
 name: Regression Tests
-
 on: [push, pull_request]
-
+permissions:
+  contents: read
 jobs:
   regression:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
       matrix:
-        crsversion: ['4.19.0', '3.3.7', '3.2.1']
-        poetry-version: ['1.7.0']
-        python-version: ['3.9', '3.10']
-
+        poetry-version: ['2.2.1']
+        crsversion: ['4.23.0', '3.3.8', '3.2.1']
+        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
     steps:
       - name: "Checkout repo"
-        uses: actions/checkout@v4
-
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - name: Set up Python 3
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6
         with:
           python-version: ${{ matrix.python-version }}
-
       - name: Install poetry
-        uses: abatilo/actions-poetry@v3
+        uses: abatilo/actions-poetry@0dd19c9498c3dc8728967849d0d2eae428a8a3d8 # v4
         with:
           poetry-version: ${{ matrix.poetry-version }}
-
       - name: "Run tests"
         run: |
           curl -L https://github.com/coreruleset/coreruleset/archive/refs/tags/v${{ matrix.crsversion }}.tar.gz -o - | tar xzvf - --strip-components=1 --wildcards "*/rules/*"
-          poetry install -v
+          poetry install -v --with dev
           poetry run pytest -vs
           poetry run secrules-parser -c --output-type github -f rules/*.conf
-

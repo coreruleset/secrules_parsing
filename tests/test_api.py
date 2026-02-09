@@ -162,3 +162,402 @@ def test_use_collection_keys() -> None:
             assert var.collection in ["ARGS_NAMES", "ARGS"]
             if var.collection == "ARGS_NAMES":
                 assert var.collectionArg in [None, "/^foo$/", "/^bar*?$/"]
+
+def test_use_commas_in_setvar() -> None:
+    """
+        Test if the value of the 'setvar' action arguments contains ',' (comma),
+        '<' (less than) or '>' (greater than) character
+    """
+    rule_text = """
+    SecRule TX:FALSE-POSITIVE-REPORT-PLUGIN_FILTER_IP "@gt 0" \
+        "id:9525140,\
+        phase:5,\
+        pass,\
+        t:none,t:length,\
+        nolog,\
+        setvar:'tx.false-positive-report-plugin_remote_addr=,%{remote_addr},',\
+        setvar:'tx.false-positive-report-plugin_smtp_subject=<server_hostname> - <host_header>: False positive report from CRS'"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    # print(ppretty(parsed_rule, depth=10))
+    matches = 0
+    for rule in parsed_rule.rules:
+        assert (rule.__class__.__name__) == "SecRule"
+        for act in rule.actions:
+            if act.varname == "tx.false-positive-report-plugin_remote_addr" and \
+               act.macro   == ",%{remote_addr},":
+                   matches += 1
+            if act.varname == "tx.false-positive-report-plugin_smtp_subject" and \
+               act.macro   == "<server_hostname> - <host_header>: False positive report from CRS":
+                   matches += 1
+        assert(matches == 2)
+
+def test_use_multi_ids_in_setvar_arg() -> None:
+    """
+        Test if the value of the 'setvar' action arguments contains multiple
+        numbers (rule ID's)
+    """
+    rule_text = """
+        SecAction \
+          "id:9525020,\
+          phase:5,\
+          nolog,\
+          pass,\
+          t:none,\
+          ver:'false-positive-report-plugin/1.0.0',\
+          setvar:'tx.false-positive-report-plugin_filter_ignore_id=949110 959100 980130 980140'"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    # print(ppretty(parsed_rule, depth=10))
+    matches = 0
+    for rule in parsed_rule.rules:
+        assert (rule.__class__.__name__) == "SecAction"
+        for act in rule.actions:
+            if act.varname == "tx.false-positive-report-plugin_filter_ignore_id" and \
+               act.macro   == "949110 959100 980130 980140":
+                   matches += 1
+        assert(matches == 1)
+
+def test_check_collection_keys() -> None:
+    """
+        Test if the rule looks for a specific key in collection
+    """
+    rule_text = """
+        SecRule ARGS:foobar "@rx attack" \
+          "id:1,\
+          phase:1,\
+          nolog,\
+          pass,\
+          t:none"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    matches = 0
+    for rule in parsed_rule.rules:
+        for v in rule.variables:
+            assert(v.collectionArg == "foobar")
+
+def test_check_collection_keys_in_target_exclusion() -> None:
+    """
+        Test if the rule looks for a specific key in collection
+    """
+    rule_text = """
+        SecRule REQUEST_URI "@beginsWith /admin" \
+          "id:1,\
+          phase:1,\
+          nolog,\
+          pass,\
+          t:none,\
+          ctl:ruleRemoveTargetById=921180;ARGS_NAMES,\
+          ctl:ruleRemoveTargetById=921180;ARGS_NAMES:folders.folders,\
+          ctl:ruleRemoveTargetById=921180;TX:paramcounter_ARGS_NAMES:folders.folders,\
+          ctl:ruleRemoveTargetByTag=OWASP;TX:paramcounter_ARGS_NAMES:folders.folders,\
+          ctl:ruleRemoveTargetByMsg='multi target';TX:paramcounter_ARGS_NAMES:folders.folders"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    matches = 0
+
+    for rule in parsed_rule.rules:
+        for action in rule.actions:
+            if action.ctl:
+                if action.ctl.ruleRemoveTargetById == 921180:
+                    matches += 1
+                if action.ctl.tagName == "OWASP":
+                    matches += 1
+                if action.ctl.message == "'multi target'":
+                    matches += 1
+                if action.ctl.removeVariable.collection == "ARGS_NAMES":
+                    matches += 1
+                if action.ctl.removeVariable.collection == "TX":
+                    matches += 1
+                if action.ctl.removeVariable.collectionArg == "folders.folders":
+                    matches += 1
+                if action.ctl.removeVariable.collectionArg == "paramcounter_ARGS_NAMES":
+                    matches += 1
+                if action.ctl.removeVariableKey == "folders.folders":
+                    matches += 1
+    # 1st excl: ID, collection (ARGS_NAMES) -> 2
+    # 2nd excl: ID, collection (ARGS_NAMES), coll arg (folders.folders) -> 3
+    # 3rd excl: ID, collection (TX), coll arg (paramcounter_ARGS_NAMES), coll arg (folders.folders) -> 4
+    # 4th excl: tag, collection (TX), coll arg (paramcounter_ARGS_NAMES), coll arg (folders.folders) -> 4
+    # 5th excl: msg, collection (TX), coll arg (paramcounter_ARGS_NAMES), coll arg (folders.folders) -> 4
+    # total 17
+    assert (matches == 17)
+
+
+def test_setenv_unquoted_syntax() -> None:
+    """
+        Test that setenv action works with unquoted syntax (issue #92)
+        This test verifies the fix in PR #93
+    """
+    rule_text = """
+    SecRule ARGS "@rx ^.{3,}$" \
+        "id:1,\
+        phase:2,\
+        pass,\
+        setenv:my_env=my_env_value"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    matches = 0
+    for rule in parsed_rule.rules:
+        assert rule.__class__.__name__ == "SecRule"
+        for act in rule.actions:
+            if act.varname == "my_env" and act.macro == "my_env_value":
+                matches += 1
+    assert matches == 1
+
+
+def test_setenv_quoted_syntax() -> None:
+    """
+        Test that setenv action works with quoted syntax (issue #92)
+        This test verifies the fix in PR #93
+    """
+    rule_text = """
+    SecRule ARGS "@rx ^.{3,}$" \
+        "id:2,\
+        phase:2,\
+        pass,\
+        setenv:'my_env=my_env_value'"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    matches = 0
+    for rule in parsed_rule.rules:
+        assert rule.__class__.__name__ == "SecRule"
+        for act in rule.actions:
+            if act.varname == "my_env" and act.macro == "my_env_value":
+                matches += 1
+    assert matches == 1
+
+
+def test_setenv_with_macro() -> None:
+    """
+        Test that setenv action works with macro values
+        This test verifies the fix in PR #93
+    """
+    rule_text = """
+    SecRule ARGS "@rx attack" \
+        "id:3,\
+        phase:2,\
+        pass,\
+        setenv:'detected_attack=%{tx.anomaly_score}'"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    matches = 0
+    for rule in parsed_rule.rules:
+        assert rule.__class__.__name__ == "SecRule"
+        for act in rule.actions:
+            if act.varname == "detected_attack" and act.macro == "%{tx.anomaly_score}":
+                matches += 1
+    assert matches == 1
+
+
+def test_setenv_deletion_quoted() -> None:
+    """
+        Test that setenv action works with deletion syntax (quoted)
+        This test verifies the fix in PR #93
+    """
+    rule_text = """
+    SecRule REQUEST_URI "@beginsWith /safe" \
+        "id:4,\
+        phase:1,\
+        pass,\
+        setenv:'!suspicious_request'"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    matches = 0
+    for rule in parsed_rule.rules:
+        assert rule.__class__.__name__ == "SecRule"
+        for act in rule.actions:
+            if act.varname == "suspicious_request" and not act.macro:
+                matches += 1
+    assert matches == 1
+
+
+def test_setenv_deletion_unquoted() -> None:
+    """
+        Test that setenv action works with deletion syntax (unquoted)
+        This test verifies the fix in PR #93
+    """
+    rule_text = """
+    SecRule REQUEST_URI "@beginsWith /safe" \
+        "id:5,\
+        phase:1,\
+        pass,\
+        setenv:!suspicious_request"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    matches = 0
+    for rule in parsed_rule.rules:
+        assert rule.__class__.__name__ == "SecRule"
+        for act in rule.actions:
+            if act.varname == "suspicious_request" and not act.macro:
+                matches += 1
+    assert matches == 1
+
+
+def test_setenv_with_special_characters() -> None:
+    """
+        Test that setenv action works with special characters in values
+        This test verifies the fix in PR #93
+    """
+    rule_text = """
+    SecRule ARGS "@rx attack" \
+        "id:6,\
+        phase:2,\
+        pass,\
+        setenv:'log_message=Attack detected: %{MATCHED_VAR}',\
+        setenv:log_level=warning"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    matches = 0
+    for rule in parsed_rule.rules:
+        assert rule.__class__.__name__ == "SecRule"
+        for act in rule.actions:
+            if act.varname == "log_message" and act.macro == "Attack detected: %{MATCHED_VAR}":
+                matches += 1
+            if act.varname == "log_level" and act.macro == "warning":
+                matches += 1
+    assert matches == 2
+
+
+def test_setenv_without_value() -> None:
+    """
+        Test that setenv action works with just a variable name (no value)
+        This test verifies the fix in PR #93
+    """
+    rule_text = """
+    SecRule REQUEST_METHOD "@streq POST" \
+        "id:7,\
+        phase:1,\
+        pass,\
+        setenv:'is_post='"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    matches = 0
+    for rule in parsed_rule.rules:
+        assert rule.__class__.__name__ == "SecRule"
+        for act in rule.actions:
+            if act.varname == "is_post" and (act.macro == "" or act.macro is None):
+                matches += 1
+    assert matches == 1
+
+
+# Parse Error Context Tests
+
+
+def test_parse_error_includes_context_field() -> None:
+    """
+    Test that parse errors include the 'context' field
+    This verifies that error responses contain context information
+    """
+    rule_text = """
+    SecRule ARGS @rx "missing quotes
+    """
+    result = parser.process_from_str(rule_text)
+
+    # Should return error dict, not a model
+    assert isinstance(result, dict), "Expected parse error to return dict"
+
+    # Verify all error fields are present
+    assert 'line' in result, "Error should include line number"
+    assert 'col' in result, "Error should include column number"
+    assert 'message' in result, "Error should include error message"
+    assert 'context' in result, "Error should include context field"
+
+    # Verify context is not None or empty
+    assert result['context'] is not None, "Context should not be None"
+    assert len(str(result['context'])) > 0, "Context should not be empty"
+
+
+def test_parse_error_context_with_invalid_directive() -> None:
+    """
+    Test that invalid directive syntax provides context
+    """
+    rule_text = """
+    InvalidDirective ARGS "@rx test"
+    """
+    result = parser.process_from_str(rule_text)
+
+    assert isinstance(result, dict), "Expected parse error"
+    assert 'context' in result, "Error should include context"
+    assert result['line'] > 0, "Should have line number"
+    assert result['col'] > 0, "Should have column number"
+
+
+def test_parse_error_context_with_missing_operator() -> None:
+    """
+    Test that incomplete operator syntax provides context
+    """
+    rule_text = """
+    SecRule ARGS @ "id:1,deny"
+    """
+    result = parser.process_from_str(rule_text)
+
+    assert isinstance(result, dict), "Expected parse error"
+    assert 'context' in result, "Error should include context"
+    assert 'message' in result, "Error should include message"
+
+
+def test_parse_error_context_with_malformed_actions() -> None:
+    """
+    Test that malformed actions provide context
+    """
+    rule_text = """
+    SecRule ARGS "@rx test" "id:,phase:2"
+    """
+    result = parser.process_from_str(rule_text)
+
+    assert isinstance(result, dict), "Expected parse error"
+    assert 'context' in result, "Error should include context"
+    assert result['line'] > 0, "Should have line number"
+
+
+def test_parse_error_context_with_unclosed_quotes() -> None:
+    """
+    Test that unclosed quotes provide context
+    """
+    rule_text = """
+    SecRule ARGS "@rx test" "id:1,msg:'unclosed message
+    """
+    result = parser.process_from_str(rule_text)
+
+    assert isinstance(result, dict), "Expected parse error"
+    assert 'context' in result, "Error should include context"
+    assert 'line' in result, "Error should include line"
+    assert 'col' in result, "Error should include col"
+
+
+def test_successful_parse_does_not_return_dict() -> None:
+    """
+    Test that successful parses return model, not dict
+    This ensures we can distinguish between success and error
+    """
+    rule_text = """
+    SecRule ARGS "@rx test" "id:1,phase:2,deny"
+    """
+    result = parser.process_from_str(rule_text)
+
+    # Successful parse should NOT return a dict
+    assert not isinstance(result, dict), "Successful parse should return model, not dict"
+
+    # Should have rules attribute
+    assert hasattr(result, 'rules'), "Model should have rules attribute"
+    assert len(result.rules) > 0, "Should have at least one rule"
+
+
+def test_parse_error_context_multiline() -> None:
+    """
+    Test that parse errors in multiline rules include context
+    """
+    rule_text = """
+    SecRule ARGS "@rx test" \\
+        "id:1,\\
+        phase:2,\\
+        invalid_action_here,\\
+        deny"
+    """
+    result = parser.process_from_str(rule_text)
+
+    assert isinstance(result, dict), "Expected parse error"
+    assert 'context' in result, "Error should include context"
+    assert result['line'] > 0, "Should have line number"
+

@@ -408,3 +408,124 @@ def test_setenv_without_value() -> None:
                 matches += 1
     assert matches == 1
 
+
+# Parse Error Context Tests
+
+
+def test_parse_error_includes_context_field() -> None:
+    """
+    Test that parse errors include the 'context' field
+    This verifies that error responses contain context information
+    """
+    rule_text = """
+    SecRule ARGS @rx "missing quotes
+    """
+    result = parser.process_from_str(rule_text)
+
+    # Should return error dict, not a model
+    assert isinstance(result, dict), "Expected parse error to return dict"
+
+    # Verify all error fields are present
+    assert 'line' in result, "Error should include line number"
+    assert 'col' in result, "Error should include column number"
+    assert 'message' in result, "Error should include error message"
+    assert 'context' in result, "Error should include context field"
+
+    # Verify context is not None or empty
+    assert result['context'] is not None, "Context should not be None"
+    assert len(str(result['context'])) > 0, "Context should not be empty"
+
+
+def test_parse_error_context_with_invalid_directive() -> None:
+    """
+    Test that invalid directive syntax provides context
+    """
+    rule_text = """
+    InvalidDirective ARGS "@rx test"
+    """
+    result = parser.process_from_str(rule_text)
+
+    assert isinstance(result, dict), "Expected parse error"
+    assert 'context' in result, "Error should include context"
+    assert result['line'] > 0, "Should have line number"
+    assert result['col'] > 0, "Should have column number"
+
+
+def test_parse_error_context_with_missing_operator() -> None:
+    """
+    Test that incomplete operator syntax provides context
+    """
+    rule_text = """
+    SecRule ARGS @ "id:1,deny"
+    """
+    result = parser.process_from_str(rule_text)
+
+    assert isinstance(result, dict), "Expected parse error"
+    assert 'context' in result, "Error should include context"
+    assert 'message' in result, "Error should include message"
+
+
+def test_parse_error_context_with_malformed_actions() -> None:
+    """
+    Test that malformed actions provide context
+    """
+    rule_text = """
+    SecRule ARGS "@rx test" "id:,phase:2"
+    """
+    result = parser.process_from_str(rule_text)
+
+    assert isinstance(result, dict), "Expected parse error"
+    assert 'context' in result, "Error should include context"
+    assert result['line'] > 0, "Should have line number"
+
+
+def test_parse_error_context_with_unclosed_quotes() -> None:
+    """
+    Test that unclosed quotes provide context
+    """
+    rule_text = """
+    SecRule ARGS "@rx test" "id:1,msg:'unclosed message
+    """
+    result = parser.process_from_str(rule_text)
+
+    assert isinstance(result, dict), "Expected parse error"
+    assert 'context' in result, "Error should include context"
+    assert 'line' in result, "Error should include line"
+    assert 'col' in result, "Error should include col"
+
+
+def test_successful_parse_does_not_return_dict() -> None:
+    """
+    Test that successful parses return model, not dict
+    This ensures we can distinguish between success and error
+    """
+    rule_text = """
+    SecRule ARGS "@rx test" "id:1,phase:2,deny"
+    """
+    result = parser.process_from_str(rule_text)
+
+    # Successful parse should NOT return a dict
+    assert not isinstance(result, dict), "Successful parse should return model, not dict"
+
+    # Should have rules attribute
+    assert hasattr(result, 'rules'), "Model should have rules attribute"
+    assert len(result.rules) > 0, "Should have at least one rule"
+
+
+def test_parse_error_context_multiline() -> None:
+    """
+    Test that parse errors in multiline rules include context
+    """
+    rule_text = """
+    SecRule ARGS "@rx test" \\
+        "id:1,\\
+        phase:2,\\
+        invalid_action_here,\\
+        deny"
+    """
+    result = parser.process_from_str(rule_text)
+
+    assert isinstance(result, dict), "Expected parse error"
+    assert 'context' in result, "Error should include context"
+    assert result['line'] > 0, "Should have line number"
+

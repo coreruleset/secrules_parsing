@@ -110,5 +110,6 @@ def process_from_str(str, verbose=False, debug=False):
             "line": e.line,
             "col": e.col,
             "message": e.message,
+            "context": e.context,
         }
     return model

@@ -278,7 +278,7 @@ tests:
               User-Agent: OWASP CRS
             method: {{ method }}
             port: 80
-            uri: "{{ uri }}
+            uri: "{{ uri }}"
           output:
             log_contains: id "{{ id }}"
 """

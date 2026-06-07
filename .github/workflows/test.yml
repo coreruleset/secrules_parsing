@@ -9,23 +9,21 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        poetry-version: ['2.2.1']
         crsversion: ['4.23.0', '3.3.8', '3.2.1']
         python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
     steps:
       - name: "Checkout repo"
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-      - name: Set up Python 3
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6
+        with:
+          persist-credentials: false
+      - name: Install uv
+        uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install poetry
-        uses: abatilo/actions-poetry@0dd19c9498c3dc8728967849d0d2eae428a8a3d8 # v4
-        with:
-          poetry-version: ${{ matrix.poetry-version }}
+          enable-cache: false
       - name: "Run tests"
         run: |
           curl -L https://github.com/coreruleset/coreruleset/archive/refs/tags/v${{ matrix.crsversion }}.tar.gz -o - | tar xzvf - --strip-components=1 --wildcards "*/rules/*"
-          poetry install -v --with dev
-          poetry run pytest -vs
-          poetry run secrules-parser -c --output-type github -f rules/*.conf
+          uv sync
+          uv run pytest -vs
+          uv run secrules-parser -c --output-type github -f rules/*.conf

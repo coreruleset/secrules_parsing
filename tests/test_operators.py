@@ -42,6 +42,60 @@ def test_operator_begins_with_macro() -> None:
     assert matches == 1
 
 
+def test_operator_begins_with_spaces() -> None:
+    """Test @beginsWith operator with a value containing spaces (issue #131)"""
+    rule_text = """
+    SecRule REQUEST_HEADERS:User-Agent "@beginsWith COOLWSD HTTP Agent" \
+        "id:1082,phase:1,deny"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    assert not isinstance(parsed_rule, dict), (
+        f"Parsing failed: {parsed_rule.get('message', 'unknown error')}"
+    )
+    matches = 0
+    for rule in parsed_rule.rules:
+        assert rule.__class__.__name__ == "SecRule"
+        if rule.operator.beginswith == "COOLWSD HTTP Agent":
+            matches += 1
+    assert matches == 1
+
+
+def test_operator_begins_with_spaces_multiple_words() -> None:
+    """Test @beginsWith operator with multiple words separated by spaces"""
+    rule_text = """
+    SecRule REQUEST_HEADERS:User-Agent "@beginsWith Mozilla Firefox Browser" \
+        "id:1083,phase:1,pass"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    assert not isinstance(parsed_rule, dict), (
+        f"Parsing failed: {parsed_rule.get('message', 'unknown error')}"
+    )
+    matches = 0
+    for rule in parsed_rule.rules:
+        assert rule.__class__.__name__ == "SecRule"
+        if rule.operator.beginswith == "Mozilla Firefox Browser":
+            matches += 1
+    assert matches == 1
+
+
+def test_operator_begins_with_spaces_single_word_unchanged() -> None:
+    """Test @beginsWith operator still works correctly with single-word values"""
+    rule_text = """
+    SecRule REQUEST_URI "@beginsWith /admin" \
+        "id:1084,phase:1,deny"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    assert not isinstance(parsed_rule, dict), (
+        f"Parsing failed: {parsed_rule.get('message', 'unknown error')}"
+    )
+    matches = 0
+    for rule in parsed_rule.rules:
+        assert rule.__class__.__name__ == "SecRule"
+        if rule.operator.beginswith == "/admin":
+            matches += 1
+    assert matches == 1
+
+
 def test_operator_ends_with() -> None:
     """Test @endsWith operator"""
     rule_text = """

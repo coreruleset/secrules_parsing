@@ -26,6 +26,20 @@ def test_operator_begins_with() -> None:
             matches += 1
     assert matches == 1
 
+def test_operator_begins_with_space_separated_string() -> None:
+    """Test @beginsWith operator for space separated string"""
+    rule_text = """
+    SecRule REQUEST_URI "@beginsWith COOLWSD HTTP Agent" \
+        "id:1000,phase:1,deny"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    matches = 0
+    for rule in parsed_rule.rules:
+        assert rule.__class__.__name__ == "SecRule"
+        if rule.operator.beginswith == "COOLWSD HTTP Agent":
+            matches += 1
+    assert matches == 1
+
 
 def test_operator_begins_with_macro() -> None:
     """Test @beginsWith operator with macro"""

@@ -98,7 +98,7 @@ Operator:
     'fuzzyHash' fuzzyhash=STRING | 'eq' eq=INT | 'ge' ge=Macro | geolookup ?= 'geoLookup'  |
     'gsbLookup' gsblookup=INT | 'gt' gt=Macro | 'inspectFile' inspectfile=URI | 'ipMatch' ipmatch+=IPCIDR[','] |
     'ipMatchF' ipmatchf=STRING | 'ipMatchFromFile' ipmatchfromfile=STRING | 'le' le=INT | 'lt' lt=Macro |
-    nomatch ?= 'noMatch' | 'pmf' pmf=PathNameValue | 'pmFromFile' pmfromfile=PathNameValue | 'pm' pm=PatternMatch |
+    nomatch ?= 'noMatch' | 'pmf' pmf=StringWithSpacesOrPath | 'pmFromFile' pmfromfile=StringWithSpacesOrPath | 'pm' pm=PatternMatch |
     'rbl' rbl=Hostname | 'rsub' rsub=AnythingBetweenSlashes | 'rx' rx=RegExp | 'streq' streq=StringWithMacros |
     'strmatch' strnmatch=STRING | unconditionalmatch ?= 'unconditionalMatch' |
     'validateByteRange' validatebyterange=ByteRangeList | 'validateDTD' validatedtd=PathNameValue |
@@ -191,6 +191,8 @@ StringWithSpaces: /[A-Za-z0-9\-\/\ \._]+/;
 PathOrMacro: PathNameValue | MacroVar;
 
 StringWithSpacesOrPathOrMacro: StringWithSpaces | PathNameValue | MacroVar;
+
+StringWithSpacesOrPath: StringWithSpaces | PathNameValue;
 
 // Filesystem Paths (could be merged with URI, tought)    
 PathNameValue: /[a-zA-Z0-9\-_\.\/;]+/;

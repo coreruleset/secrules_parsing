@@ -50,27 +50,27 @@ test = ["pytest (>=6)"]
 
 [[package]]
 name = "importlib-metadata"
-version = "8.7.1"
+version = "8.9.0"
 description = "Read metadata from Python packages"
 optional = false
-python-versions = ">=3.9"
+python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "importlib_metadata-8.7.1-py3-none-any.whl", hash = "sha256:5a1f80bf1daa489495071efbb095d75a634cf28a8bc299581244063b53176151"},
-    {file = "importlib_metadata-8.7.1.tar.gz", hash = "sha256:49fef1ae6440c182052f407c8d34a68f72efc36db9ca90dc0113398f2fdde8bb"},
+    {file = "importlib_metadata-8.9.0-py3-none-any.whl", hash = "sha256:e0f761b6ea91ced3b0844c14c9d955224d538105921f8e6754c00f6ca79fba7f"},
+    {file = "importlib_metadata-8.9.0.tar.gz", hash = "sha256:58850626cef4bd2df100378b0f2aea9724a7b92f10770d547725b047078f99ee"},
 ]
 
 [package.dependencies]
 zipp = ">=3.20"
 
 [package.extras]
-check = ["pytest-checkdocs (>=2.4)", "pytest-ruff (>=0.2.1) ; sys_platform != \"cygwin\""]
+check = ["pytest-checkdocs (>=2.14)", "pytest-ruff (>=0.2.1) ; sys_platform != \"cygwin\""]
 cover = ["pytest-cov"]
 doc = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-lint"]
 enabler = ["pytest-enabler (>=3.4)"]
 perf = ["ipython"]
-test = ["flufl.flake8", "jaraco.test (>=5.4)", "packaging", "pyfakefs", "pytest (>=6,!=8.1.*)", "pytest-perf (>=0.9.2)"]
-type = ["mypy (<1.19) ; platform_python_implementation == \"PyPy\"", "pytest-mypy (>=1.0.1)"]
+test = ["packaging", "pyfakefs", "pytest (>=6,!=8.1.*)", "pytest-perf (>=0.9.2)"]
+type = ["pytest-mypy (>=1.0.1) ; platform_python_implementation != \"PyPy\""]
 
 [[package]]
 name = "iniconfig"
@@ -185,14 +185,14 @@ type = ["importlib_metadata (>=7.0.2) ; python_version < \"3.10\"", "jaraco.deve
 
 [[package]]
 name = "textx"
-version = "4.3.0"
+version = "4.4.0"
 description = "Meta-language for DSL implementation inspired by Xtext"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "textx-4.3.0-py3-none-any.whl", hash = "sha256:261535f7e2de1529604026d58bf7dae9e40788644def4d033ca781680fa5dae7"},
-    {file = "textx-4.3.0.tar.gz", hash = "sha256:0facac8029ad124ef21e5838dd8eb67f10129efcee96ea3548f5fd62428a9880"},
+    {file = "textx-4.4.0-py3-none-any.whl", hash = "sha256:f08071316d662d8dbecb0e8322510eeba71e89fa91c69a5278cbebfd1debde42"},
+    {file = "textx-4.4.0.tar.gz", hash = "sha256:a7b15a4698b503edde631d5227c0d0f6024898a86a7924b5fc741973305f9286"},
 ]
 
 [package.dependencies]
@@ -307,4 +307,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4.0"
-content-hash = "b79764fab4fc5772cea0e1a9c30ac6f926e77d0175a8505d270fa202c5543e7c"
+content-hash = "e57b17df614dd7d27d9739b38537f99bcf80695505dc8734a8d3fd39ccedcb63"

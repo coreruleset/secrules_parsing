@@ -88,6 +88,38 @@ def test_collection_argument_with_dollar() -> None:
     assert matched
 
 
+def test_collection_cidr() -> None:
+    """Test that a collection argument can contain a CIDR."""
+    rule_text = """
+    SecRule REMOTE_ADDR "@ipMatch 8.8.8.0/24" "id:1,phase:2,pass"
+    SecRule REMOTE_ADDR "@ipMatch 2001:db8::/32" "id:1,phase:2,pass"
+    """
+
+    parsed_rule = parser.process_from_str(rule_text)
+    matched = False
+    for rule in parsed_rule.rules:
+        assert rule.__class__.__name__ == "SecRule"
+        for action in rule.actions:
+        #TODO
+
+    assert matched
+
+
+def test_collection_env() -> None:
+    """Test that a collection argument can contain an environment variable."""
+    rule_text = """
+    SecRule REQUEST_URI "@rx .?" "id:1,phase:2,pass,setenv:my_env=my_env_value"
+    """
+
+    parsed_rule = parser.process_from_str(rule_text)
+    matched = False
+    for rule in parsed_rule.rules:
+        assert rule.__class__.__name__ == "SecRule"
+        #TODO
+
+    assert matched
+
+
 def test_lowercase_and_uppercase_in_argument() -> None:
     """ Example test showing how to find if a rule has a lowercase transformation, then see if the target
     of the rule has an uppercase regex. """

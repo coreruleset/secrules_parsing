@@ -30,7 +30,7 @@ packages = [
 [tool.poetry.dependencies]
 python = ">=3.10,<4.0"
 textX = ">=4.4,<4.5"
-importlib-metadata = ">=8.9.0,<8.10.0"
+importlib-metadata = ">=9.0.1,<9.1.0"
 setuptools = ">=65.0.0,<81.0.0"
 
 [tool.poetry.scripts]

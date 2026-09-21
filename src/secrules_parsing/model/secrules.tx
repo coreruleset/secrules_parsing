@@ -178,8 +178,8 @@ ByteRangeList: byterange*=RangeINT[','];
 
 RangeINT: INT '-' INT | INT;
     
-// Should match ips
-IPCIDR: /[0-9a-f\.\:]+/;
+// Should match ips. CIDR prefix covers 0-128 to allow both IPv4 (/0-/32) and IPv6 (/0-/128).
+IPCIDR: /[0-9a-f\.\:]+(?:\/(?:12[0-8]|1[01][0-9]|[1-9]?[0-9]))?/;
 
 // Single Quote delimited STRING
 SQDelimitedSTRING: "'" msg=MessageValue? ':'? macro=MacroVar? "'";
@@ -251,8 +251,7 @@ AuditEngineValue: OnOffValue | 'RelevantOnly';
 
 RuleEngineValue: OnOffValue | 'DetectionOnly';
 
-// Can this be used multiple times, e.g.: +AC?
-AuditLogPartsValue: /(\+|-)[A-Z]/;
+AuditLogPartsValue: /(\+|-)[A-Z]+/;
 
 RequestBodyProcessorValue: 'text/xml' | 'text/json' | 'URLENCODED' | 'JSON' | 'MULTIPART' | 'XML';
 

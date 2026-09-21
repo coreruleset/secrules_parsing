@@ -1,6 +1,6 @@
 [project]
 name = "secrules-parsing"
-version = "0.2.4"
+version = "0.4.1"
 description = "ModSecurity DSL Parser package using textX"
 authors = [
     { name = "Felipe Zipitria", email = "felipe.zipitria@owasp.org" }

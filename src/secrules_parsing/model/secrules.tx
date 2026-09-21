@@ -93,12 +93,12 @@ AnythingBetweenSingleQuotes: /\'.+\'/;
     
 //- pattern match (pm/pmf)    
 Operator:
-    ('beginsWith' beginswith=PathOrMacro | 'contains' contains=PatternMatch | 'containsWord' containsWord=STRING |
+    ('beginsWith' beginswith=StringWithSpacesOrPathOrMacro | 'contains' contains=PatternMatch | 'containsWord' containsWord=STRING |
     detectsqli ?= 'detectSQLi' | detectxss ?= 'detectXSS' | 'endsWith' endswith=ExtendedMacro |
     'fuzzyHash' fuzzyhash=STRING | 'eq' eq=INT | 'ge' ge=Macro | geolookup ?= 'geoLookup'  |
     'gsbLookup' gsblookup=INT | 'gt' gt=Macro | 'inspectFile' inspectfile=URI | 'ipMatch' ipmatch+=IPCIDR[','] |
     'ipMatchF' ipmatchf=STRING | 'ipMatchFromFile' ipmatchfromfile=STRING | 'le' le=INT | 'lt' lt=Macro |
-    nomatch ?= 'noMatch' | 'pmf' pmf=PathNameValue | 'pmFromFile' pmfromfile=PathNameValue | 'pm' pm=PatternMatch |
+    nomatch ?= 'noMatch' | 'pmf' pmf=StringWithSpacesOrPath | 'pmFromFile' pmfromfile=StringWithSpacesOrPath | 'pm' pm=PatternMatch |
     'rbl' rbl=Hostname | 'rsub' rsub=AnythingBetweenSlashes | 'rx' rx=RegExp | 'streq' streq=StringWithMacros |
     'strmatch' strnmatch=STRING | unconditionalmatch ?= 'unconditionalMatch' |
     'validateByteRange' validatebyterange=ByteRangeList | 'validateDTD' validatedtd=PathNameValue |
@@ -122,7 +122,7 @@ Action:
     auditlog ?= 'auditlog' | capture ?= 'capture' |  chain ?= 'chain' | 'ctl:' ctl=TransientAction |
     'deprecatevar:' deprecatevar=ID | 'exec:' exec=STRING | 'expirevar:' "'"? varname=VariableName '=' Macro "'"? |
     'id:' "'"? id=INT "'"? | 'initcol:' colname=StandardColName '=' colvalue=Macro |
-    "logdata:" logdata=StringWithMacros | log ?= 'log' | 'maturity:' "'"? maturity=INT "'"? |
+    "logdata:" logdata=MessageValue | log ?= 'log' | 'maturity:' "'"? maturity=INT "'"? |
     'msg:' msg=MessageValue | multimatch ?= 'multiMatch'  | noauditlog ?= 'noauditlog' | nolog ?= 'nolog' |
     'phase:' phase=Phase | 'prepend:' "'"? prepend=STRING "'"? | 'proxy:' proxy=STRING | 'redirect:' redirect=STRING |
     "rev:" "'"? rev=INT "'"? | 'sanitiseArg:' sanitizearg=ParameterName | sanitizematched ?= 'sanitiseMatched' |
@@ -189,7 +189,11 @@ StringWithMacros: "'" ExtendedMacroWithComma "'";
 StringWithSpaces: /[A-Za-z0-9\-\/\ \._]+/;
 
 PathOrMacro: PathNameValue | MacroVar;
-    
+
+StringWithSpacesOrPathOrMacro: StringWithSpaces | PathNameValue | MacroVar;
+
+StringWithSpacesOrPath: StringWithSpaces | PathNameValue;
+
 // Filesystem Paths (could be merged with URI, tought)    
 PathNameValue: /[a-zA-Z0-9\-_\.\/;]+/;
 

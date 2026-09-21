@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.4.1](https://github.com/coreruleset/secrules_parsing/compare/v0.4.0...v0.4.1) (2026-09-21)
+
+
+### Bug Fixes
+
+* allow escaped single quotes in logdata action value ([#138](https://github.com/coreruleset/secrules_parsing/issues/138)) ([5a7c96d](https://github.com/coreruleset/secrules_parsing/commit/5a7c96da130306e18593bdd5a73fb6262a6ccfe8))
+* **deps:** update all major dependencies to v9 in .github/workflows/test.yml ([#113](https://github.com/coreruleset/secrules_parsing/issues/113)) ([a104217](https://github.com/coreruleset/secrules_parsing/commit/a1042172b13084984e0648f5ab998364b2ff34b4))
+* **deps:** update all non-major dependencies in pyproject.toml ([#137](https://github.com/coreruleset/secrules_parsing/issues/137)) ([7d6e9a0](https://github.com/coreruleset/secrules_parsing/commit/7d6e9a06cfff25e5c15d400bc3333b042f17fd49))
+* **deps:** update dependency setuptools to v83 [security] ([#130](https://github.com/coreruleset/secrules_parsing/issues/130)) ([60d44e0](https://github.com/coreruleset/secrules_parsing/commit/60d44e0610a613aad78616856fb086b55772c47d))
+
 ## [Unreleased](https://github.com/fzipi/secrules_parsing/compare/v0.2.2...HEAD) (2023-12-19)
 
 ### Features

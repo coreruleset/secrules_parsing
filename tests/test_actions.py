@@ -174,6 +174,22 @@ def test_action_logdata() -> None:
     assert matches >= 1
 
 
+def test_action_logdata_with_escaped_quotes() -> None:
+    """Test logdata action with JSON-like content containing escaped single quotes"""
+    rule_text = """
+    SecAction "id:1,phase:5,pass,logdata:'{ \\'Protocol\\' : \\'%{REQUEST_PROTOCOL}\\' }'"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    assert not isinstance(parsed_rule, dict)
+    matches = 0
+    for rule in parsed_rule.rules:
+        for action in rule.actions:
+            if getattr(action, 'logdata', None):
+                assert action.logdata == "'{ \\'Protocol\\' : \\'%{REQUEST_PROTOCOL}\\' }'"
+                matches += 1
+    assert matches == 1
+
+
 # Disruptive Actions
 
 

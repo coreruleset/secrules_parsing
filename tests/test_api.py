@@ -89,24 +89,29 @@ def test_collection_argument_with_dollar() -> None:
 
 
 def test_collection_cidr() -> None:
-    """Test that a collection argument can contain a CIDR."""
+    """Test that the ipMatch operator can contain an IPv4 or IPv6 CIDR,
+    including the full IPv4 (/0-/32) and IPv6 (/0-/128) prefix ranges."""
     rule_text = """
     SecRule REMOTE_ADDR "@ipMatch 8.8.8.0/24" "id:1,phase:2,pass"
     SecRule REMOTE_ADDR "@ipMatch 2001:db8::/32" "id:1,phase:2,pass"
+    SecRule REMOTE_ADDR "@ipMatch 0.0.0.0/0" "id:1,phase:2,pass"
+    SecRule REMOTE_ADDR "@ipMatch 10.0.0.0/8" "id:1,phase:2,pass"
+    SecRule REMOTE_ADDR "@ipMatch 2001:db8::1/128" "id:1,phase:2,pass"
     """
 
     parsed_rule = parser.process_from_str(rule_text)
-    matched = False
-    for rule in parsed_rule.rules:
+    matches = 0
+    expected = ["8.8.8.0/24", "2001:db8::/32", "0.0.0.0/0", "10.0.0.0/8", "2001:db8::1/128"]
+    for rule, cidr in zip(parsed_rule.rules, expected):
         assert rule.__class__.__name__ == "SecRule"
-        for action in rule.actions:
-        #TODO
+        assert rule.operator.ipmatch == [cidr]
+        matches += 1
 
-    assert matched
+    assert matches == len(expected)
 
 
 def test_collection_env() -> None:
-    """Test that a collection argument can contain an environment variable."""
+    """Test that setenv accepts an unquoted `name=value` pair."""
     rule_text = """
     SecRule REQUEST_URI "@rx .?" "id:1,phase:2,pass,setenv:my_env=my_env_value"
     """
@@ -115,7 +120,29 @@ def test_collection_env() -> None:
     matched = False
     for rule in parsed_rule.rules:
         assert rule.__class__.__name__ == "SecRule"
-        #TODO
+        for action in rule.actions:
+            if getattr(action, "varname", None):
+                assert action.varname == "my_env"
+                assert action.macro == "my_env_value"
+                matched = True
+
+    assert matched
+
+
+def test_ctl_auditlogparts_multiletter() -> None:
+    """Test that ctl:auditLogParts accepts more than one letter (e.g. +ABCZ)."""
+    rule_text = """
+    SecRule ARGS "@rx attack" "id:1,phase:2,pass,ctl:auditLogParts=+ABCDEFGHIJKLZ"
+    """
+
+    parsed_rule = parser.process_from_str(rule_text)
+    matched = False
+    for rule in parsed_rule.rules:
+        assert rule.__class__.__name__ == "SecRule"
+        for action in rule.actions:
+            if getattr(action, "ctl", None):
+                assert action.ctl.auditLogParts == "+ABCDEFGHIJKLZ"
+                matched = True
 
     assert matched
 

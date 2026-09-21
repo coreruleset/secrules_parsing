@@ -122,7 +122,7 @@ Action:
     auditlog ?= 'auditlog' | capture ?= 'capture' |  chain ?= 'chain' | 'ctl:' ctl=TransientAction |
     'deprecatevar:' deprecatevar=ID | 'exec:' exec=STRING | 'expirevar:' "'"? varname=VariableName '=' Macro "'"? |
     'id:' "'"? id=INT "'"? | 'initcol:' colname=StandardColName '=' colvalue=Macro |
-    "logdata:" logdata=StringWithMacros | log ?= 'log' | 'maturity:' "'"? maturity=INT "'"? |
+    "logdata:" logdata=MessageValue | log ?= 'log' | 'maturity:' "'"? maturity=INT "'"? |
     'msg:' msg=MessageValue | multimatch ?= 'multiMatch'  | noauditlog ?= 'noauditlog' | nolog ?= 'nolog' |
     'phase:' phase=Phase | 'prepend:' "'"? prepend=STRING "'"? | 'proxy:' proxy=STRING | 'redirect:' redirect=STRING |
     "rev:" "'"? rev=INT "'"? | 'sanitiseArg:' sanitizearg=ParameterName | sanitizematched ?= 'sanitiseMatched' |

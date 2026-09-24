@@ -102,12 +102,29 @@ def test_collection_cidr() -> None:
     parsed_rule = parser.process_from_str(rule_text)
     matches = 0
     expected = ["8.8.8.0/24", "2001:db8::/32", "0.0.0.0/0", "10.0.0.0/8", "2001:db8::1/128"]
-    for rule, cidr in zip(parsed_rule.rules, expected):
+    for rule, cidr in zip(parsed_rule.rules, expected, strict=True):
         assert rule.__class__.__name__ == "SecRule"
         assert rule.operator.ipmatch == [cidr]
         matches += 1
 
     assert matches == len(expected)
+
+
+def test_collection_cidr_rejects_invalid_prefix() -> None:
+    """Test that IPv4 prefixes above /32 and IPv6 prefixes above /128 are rejected."""
+    ipv4_rule_text = """
+    SecRule REMOTE_ADDR "@ipMatch 8.8.8.0/33" "id:1,phase:2,pass"
+    """
+    result = parser.process_from_str(ipv4_rule_text)
+    assert isinstance(result, dict)
+    assert "line" in result and "col" in result
+
+    ipv6_rule_text = """
+    SecRule REMOTE_ADDR "@ipMatch 2001:db8::1/129" "id:1,phase:2,pass"
+    """
+    result = parser.process_from_str(ipv6_rule_text)
+    assert isinstance(result, dict)
+    assert "line" in result and "col" in result
 
 
 def test_collection_env() -> None:

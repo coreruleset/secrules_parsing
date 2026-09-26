@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.2](https://github.com/coreruleset/secrules_parsing/compare/v0.4.1...v0.4.2) (2026-09-26)
+
+
+### Bug Fixes
+
+* CIDR & AuditLogPartsValue syntax ([#94](https://github.com/coreruleset/secrules_parsing/issues/94)) ([20b6c34](https://github.com/coreruleset/secrules_parsing/commit/20b6c34c0a7124f6287d0ff6078a3459219adb32))
+
 ## [0.4.1](https://github.com/coreruleset/secrules_parsing/compare/v0.4.0...v0.4.1) (2026-09-21)
 
 

@@ -588,3 +588,15 @@ def test_parse_error_context_multiline() -> None:
     assert 'context' in result, "Error should include context"
     assert result['line'] > 0, "Should have line number"
 
+
+
+def test_operator_beginswith_endswith_accept_any_string() -> None:
+    """beginsWith/endsWith take an arbitrary string, e.g. a content type with ';'"""
+    rule_text = """
+    SecRule REQUEST_HEADERS:Content-Type "@beginsWith text/xml;" "id:1,pass,t:none"
+    SecRule REQUEST_HEADERS:Content-Type "@endsWith ; charset=utf-8" "id:2,pass,t:none"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    assert not isinstance(parsed_rule, dict), parsed_rule
+    assert parsed_rule.rules[0].operator.beginswith == "text/xml;"
+    assert parsed_rule.rules[1].operator.endswith == "; charset=utf-8"

@@ -4,6 +4,14 @@
   "include-v-in-tag": true,
   "include-component-in-tag": false,
   "packages": {
-    ".": {}
+    ".": {
+      "extra-files": [
+        {
+          "type": "toml",
+          "path": "uv.lock",
+          "jsonpath": "$.package[?(@.name.value=='secrules-parsing')].version"
+        }
+      ]
+    }
   }
 }

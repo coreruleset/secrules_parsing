@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.4.2](https://github.com/coreruleset/secrules_parsing/compare/v0.4.1...v0.4.2) (2026-10-06)
+
+
+### Bug Fixes
+
+* accept any string in beginsWith and endsWith operators ([#149](https://github.com/coreruleset/secrules_parsing/issues/149)) ([05548d5](https://github.com/coreruleset/secrules_parsing/commit/05548d55fcc5505c4a429ce528c77971dc224039))
+* cap IPv4 CIDR prefixes at /32 and IPv6 at /128 ([#146](https://github.com/coreruleset/secrules_parsing/issues/146)) ([6d986e5](https://github.com/coreruleset/secrules_parsing/commit/6d986e5fdc3c167827d4270d6977a09e11773721))
+* CIDR & AuditLogPartsValue syntax ([#94](https://github.com/coreruleset/secrules_parsing/issues/94)) ([20b6c34](https://github.com/coreruleset/secrules_parsing/commit/20b6c34c0a7124f6287d0ff6078a3459219adb32))
+
 ## [0.4.1](https://github.com/coreruleset/secrules_parsing/compare/v0.4.0...v0.4.1) (2026-09-21)
 
 

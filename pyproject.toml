@@ -18,7 +18,7 @@ classifiers = [
 
 dependencies = [
     "textX>=4.4,<4.5",
-    "importlib-metadata>=9.0.1,<9.1.0",
+    "importlib-metadata>=9.1.0,<9.2.0",
 ]
 
 [project.urls]

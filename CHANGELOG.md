@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.3](https://github.com/coreruleset/secrules_parsing/compare/v0.4.2...v0.4.3) (2026-10-30)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies in .github/workflows/test.yml ([#156](https://github.com/coreruleset/secrules_parsing/issues/156)) ([b02e904](https://github.com/coreruleset/secrules_parsing/commit/b02e9042156715937c2408fdd6fb362c4fa80379))
+
 ## [0.4.2](https://github.com/coreruleset/secrules_parsing/compare/v0.4.1...v0.4.2) (2026-10-06)
 
 

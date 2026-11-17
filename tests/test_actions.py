@@ -190,6 +190,42 @@ def test_action_logdata_with_escaped_quotes() -> None:
     assert matches == 1
 
 
+# Regression for issue #160: 0.4.0 rejected parentheses and square brackets in
+# logdata, e.g. CRS rule 953130's "Output of phpinfo() function found within ...".
+BRACKETED_TEXTS = [
+    "Output of phpinfo() function",
+    "Output of phpinfo() function found within %{MATCHED_VAR_NAME}",
+    "a (b) c",
+    "a [b] c",
+    "a {b} c",
+    "f(x, y)",
+    "a (%{tx.0})",
+    "x = %{tx.a}() and [%{tx.b}]",
+]
+
+
+@pytest.mark.parametrize("action", ["msg", "logdata"])
+@pytest.mark.parametrize("text", BRACKETED_TEXTS)
+def test_action_message_with_brackets(action: str, text: str) -> None:
+    """msg and logdata accept parentheses and brackets, with and without macros"""
+    rule_text = f"""
+    SecRule RESPONSE_BODY "@rx foo" \\
+        "id:953130,\\
+        phase:4,\\
+        block,\\
+        t:none,\\
+        {action}:'{text}',\\
+        tag:'OWASP_CRS'"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    assert not isinstance(parsed_rule, dict), parsed_rule
+    values = [
+        getattr(a, action) for rule in parsed_rule.rules for a in rule.actions
+        if getattr(a, action, None)
+    ]
+    assert values == [f"'{text}'"]
+
+
 # Disruptive Actions
 
 

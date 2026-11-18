@@ -5,6 +5,7 @@
   "include-component-in-tag": false,
   "packages": {
     ".": {
+      "bump-minor-pre-major": true,
       "extra-files": [
         {
           "type": "toml",

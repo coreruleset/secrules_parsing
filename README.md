@@ -2,6 +2,8 @@
 
 Incomplete parser model and sample application for parsing [Core Rule Set](https://github.com/coreruleset/coreruleset/) written in the ModSecurity DSL SecRule language. It uses the python library [textX](http://www.igordejanovic.net/textX/) for parsing.
 
+Requires Python 3.11 or later. Version 0.4.2 is the last release that supports Python 3.10.
+
 ## How to use it (CLI):
 
 1. Install dependencies

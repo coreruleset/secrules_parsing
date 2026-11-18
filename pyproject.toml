@@ -13,6 +13,11 @@ keywords = ["secrule", "modsecurity", "parser", "textX"]
 
 classifiers = [
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Operating System :: OS Independent",
 ]
 
@@ -45,5 +50,7 @@ build-backend = "uv_build"
 
 [tool.uv]
 # uv 0.13.0 is the first version that writes lock revision 5; older versions
-# rewrite the whole uv.lock in an older format
-required-version = ">=0.13.0"
+# rewrite the whole uv.lock in an older format. The upper bound keeps CI
+# (setup-uv reads this) from picking up a uv with a newer lock format; raise it
+# together with a relock.
+required-version = ">=0.13.0,<0.14"

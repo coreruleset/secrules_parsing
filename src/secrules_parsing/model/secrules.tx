@@ -99,7 +99,7 @@ Operator:
     'gsbLookup' gsblookup=INT | 'gt' gt=Macro | 'inspectFile' inspectfile=URI | 'ipMatch' ipmatch+=IPCIDR[','] |
     'ipMatchF' ipmatchf=STRING | 'ipMatchFromFile' ipmatchfromfile=STRING | 'le' le=INT | 'lt' lt=Macro |
     nomatch ?= 'noMatch' | 'pmf' pmf=StringWithSpacesOrPath | 'pmFromFile' pmfromfile=StringWithSpacesOrPath | 'pm' pm=PatternMatch |
-    'rbl' rbl=Hostname | 'rsub' rsub=AnythingBetweenSlashes | 'rx' rx=RegExp | 'streq' streq=StringWithMacros |
+    'rbl' rbl=Hostname | 'rsub' rsub=AnythingBetweenSlashes | 'rx' rx=RegExp | 'streq' streq=PatternMatch |
     'strmatch' strnmatch=STRING | unconditionalmatch ?= 'unconditionalMatch' |
     'validateByteRange' validatebyterange=ByteRangeList | 'validateDTD' validatedtd=PathNameValue |
     'validateHash' validatehash=RegExp | 'validateSchema' validateschema=PathNameValue |
@@ -183,8 +183,6 @@ IPCIDR: /[0-9a-f\.\:]*:[0-9a-f\.\:]*(?:\/(?:12[0-8]|1[01][0-9]|[1-9]?[0-9]))?|[0
 
 // Single Quote delimited STRING
 SQDelimitedSTRING: "'" msg=MessageValue? ':'? macro=MacroVar? "'";
-// This string has macros inside, but their value isn't stored in a variable for now.
-StringWithMacros: "'" ExtendedMacroWithComma "'";
 // String with spaces: when using streq, there are places where a request line is tested
 StringWithSpaces: /[A-Za-z0-9\-\/\ \._]+/;
 

@@ -6,6 +6,8 @@ Tests all operator types defined in the grammar
 Note: Some operators may have parsing issues or may require specific syntax.
 Tests are designed to validate the current parser behavior.
 """
+import pytest
+
 from secrules_parsing import parser
 
 
@@ -116,6 +118,36 @@ def test_operator_streq() -> None:
         if rule.operator.streq:
             matches += 1
     assert matches == 1
+
+
+# Regression for issue #163: these were silently parsed as an implicit @rx
+STREQ_VALUES = [
+    "POST",
+    "'POST'",
+    "phpinfo()",
+    "'phpinfo()'",
+    "a[b]",
+    "'a[b]'",
+    "'a{b}'",
+    "%{tx.a}()",
+    "'%{tx.a}()'",
+    "HTTP/1.1",
+    "GET /index.html HTTP/1.1",
+]
+
+
+@pytest.mark.parametrize("value", STREQ_VALUES)
+def test_operator_streq_values(value: str) -> None:
+    """@streq keeps its value, quoted or not, with brackets and macros"""
+    rule_text = f"""
+    SecRule ARGS "@streq {value}" \\
+        "id:1006,phase:2,deny"
+    """
+    parsed_rule = parser.process_from_str(rule_text)
+    assert not isinstance(parsed_rule, dict), parsed_rule
+    operator = parsed_rule.rules[0].operator
+    assert operator.streq == value
+    assert not operator.rx
 
 
 def test_operator_strmatch() -> None:
